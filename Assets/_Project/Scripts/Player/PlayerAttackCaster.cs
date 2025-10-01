@@ -1,7 +1,8 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using WizardBrawl.Core;
-using WizardBrawl.Data;
+using WizardBrawl.Magic;
+using WizardBrawl.Magic.Data;
 
 namespace WizardBrawl.Player
 {

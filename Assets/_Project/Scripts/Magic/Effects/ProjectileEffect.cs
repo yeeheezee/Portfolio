@@ -1,5 +1,6 @@
 using UnityEngine;
-using WizardBrawl.Data;
+using WizardBrawl.Core;
+using WizardBrawl.Magic.Data;
 
 namespace WizardBrawl.Magic.Effects
 {

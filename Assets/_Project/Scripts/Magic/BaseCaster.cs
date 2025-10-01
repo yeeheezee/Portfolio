@@ -1,8 +1,8 @@
 using UnityEngine;
 using System.Collections.Generic;
-using WizardBrawl.Data;
+using WizardBrawl.Magic.Data;
 
-namespace WizardBrawl.Core
+namespace WizardBrawl.Magic
 {
     /// <summary>
     /// 스킬 시전과 쿨타임 관리 기능을 제공.

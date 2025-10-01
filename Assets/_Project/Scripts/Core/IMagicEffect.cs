@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace WizardBrawl.Magic.Effects
+namespace WizardBrawl.Core
 {
     /// <summary>
     /// 모든 마법 실행 로직 클래스가 구현해야 하는 인터페이스.

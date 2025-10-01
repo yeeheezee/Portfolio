@@ -1,7 +1,7 @@
 using UnityEngine;
-using WizardBrawl.Magic.Effects;
+using WizardBrawl.Core;
 
-namespace WizardBrawl.Data
+namespace WizardBrawl.Magic.Data
 {
     /// <summary>
     /// 모든 마법 데이터 관리를 위한 클래스

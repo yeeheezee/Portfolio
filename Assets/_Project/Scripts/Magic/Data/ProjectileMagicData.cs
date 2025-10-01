@@ -1,7 +1,8 @@
 using UnityEngine;
+using WizardBrawl.Core;
 using WizardBrawl.Magic.Effects;
 
-namespace WizardBrawl.Data
+namespace WizardBrawl.Magic.Data
 {
     /// <summary>
     /// 투사체 발사 유형의 마법 데이터 정의.

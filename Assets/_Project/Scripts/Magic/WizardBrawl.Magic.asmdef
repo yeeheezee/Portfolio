@@ -1,0 +1,17 @@
+{
+    "name": "WizardBrawl.Magic",
+    "rootNamespace": "",
+    "references": [
+        "GUID:dc5394e109899c1459a2e0d8b469a989",
+        "GUID:36a07569daca6a442b192b3b2e4bd5e2"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
