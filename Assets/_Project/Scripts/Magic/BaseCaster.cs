@@ -26,12 +26,12 @@ namespace WizardBrawl.Magic
             // 스킬이 없거나 쿨타임이 차지 않았으면 실행 중단.
             if (skill == null)
             {
-                Debug.LogError("시도한 스킬(MagicData)이 할당되지 않았습니다!"); // 로그 추가
+                Debug.LogError("시도한 스킬(MagicData)이 할당되지 않았습니다!");
                 return;
             }
             if (!IsSkillReady(skill))
             {
-                Debug.LogWarning("스킬 쿨타임이 아직 차지 않았습니다!"); // 로그 추가
+                Debug.LogWarning("스킬 쿨타임이 아직 차지 않았습니다!"); 
                 return;
             }
 

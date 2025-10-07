@@ -2,7 +2,8 @@
     "name": "WizardBrawl.Enemy",
     "rootNamespace": "",
     "references": [
-        "GUID:dc5394e109899c1459a2e0d8b469a989"
+        "GUID:dc5394e109899c1459a2e0d8b469a989",
+        "GUID:173a34dc3689c7749b139d2d903de236"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
