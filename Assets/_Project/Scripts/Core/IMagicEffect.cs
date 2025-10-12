@@ -11,6 +11,6 @@ namespace WizardBrawl.Core
         /// 마법 효과를 실행함.
         /// </summary>
         /// <param name="caster">마법을 시전하는 게임 오브젝트.</param>
-        void Execute(GameObject caster);
+        void Execute(GameObject caster, Vector3 fireDirection);
     }
 }

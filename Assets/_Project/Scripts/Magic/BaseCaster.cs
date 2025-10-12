@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using WizardBrawl.Magic.Data;
+using System.IO.Pipes;
 
 namespace WizardBrawl.Magic
 {
@@ -21,7 +22,7 @@ namespace WizardBrawl.Magic
         /// 지정된 마법 스킬을 사용하고 쿨타임을 기록함.
         /// 자식 클래스에서 이 기능을 호출하여 스킬을 사용함.
         /// </summary>
-        protected void UseSkill(MagicData skill)
+        protected void UseSkill(MagicData skill, Vector3 fireDirection)
         {
             // 스킬이 없거나 쿨타임이 차지 않았으면 실행 중단.
             if (skill == null)
@@ -36,7 +37,7 @@ namespace WizardBrawl.Magic
             }
 
             // Effect 생성 및 실행
-            skill.CreateEffect().Execute(gameObject);
+            skill.CreateEffect().Execute(gameObject, fireDirection);
             // 쿨타임 기록
             _cooldownTimers[skill] = Time.time;
 

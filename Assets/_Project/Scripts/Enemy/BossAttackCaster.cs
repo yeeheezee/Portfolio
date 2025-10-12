@@ -13,26 +13,26 @@ namespace WizardBrawl.Enemy
         [SerializeField] private MagicData _unparryableAttack;
         // TODO: 연속 공격(콤보)을 위한 데이터 리스트 추가
 
-        // AI가 마법의 쿨타임을 외부에서 확인할 수 있도록 public으로 열어줌
-        public MagicData StandardAttack => _standardAttack;
-        public MagicData HeavyAttack => _heavyAttack;
-        public MagicData UnparryableAttack => _unparryableAttack;
+        // AI는 MagicData의 존재를 알 필요 없이, 이 프로퍼티만 확인하면 되도록 변경.
+        public bool IsStandardAttackReady => IsSkillReady(_standardAttack);
+        public bool IsHeavyAttackReady => IsSkillReady(_heavyAttack);
+        public bool IsUnparryableAttackReady => IsSkillReady(_unparryableAttack);
 
 
         // AI가 호출할 메서드들
         public void PerformStandardAttack()
         {
-            UseSkill(_standardAttack);
+            UseSkill(_standardAttack, transform.forward);
         }
 
         public void PerformHeavyAttack()
         {
-            UseSkill(_heavyAttack);
+            UseSkill(_heavyAttack, transform.forward);
         }
 
         public void PerformUnparryableAttack()
         {
-            UseSkill(_unparryableAttack);
+            UseSkill(_unparryableAttack, transform.forward);
         }
     }
 }

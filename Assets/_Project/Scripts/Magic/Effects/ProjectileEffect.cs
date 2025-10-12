@@ -19,7 +19,7 @@ namespace WizardBrawl.Magic.Effects
         /// <summary>
         /// 마법 효과 실행.
         /// </summary>
-        public void Execute(GameObject caster)
+        public void Execute(GameObject caster, Vector3 fireDirection)
         {
             // 프리팹이 설정되지 않았으면 경고 출력 후 종료.
             if (_data.ProjectilePrefab == null)
@@ -39,11 +39,8 @@ namespace WizardBrawl.Magic.Effects
             GameObject projectileGO = Object.Instantiate(
                 _data.ProjectilePrefab,
                 spawnPoint.position,
-                spawnPoint.rotation
+                Quaternion.LookRotation(fireDirection)
             );
-
-            // 카메라 기준 발사 방향 계산.
-            Vector3 fireDirection = Camera.main.transform.forward;
 
             // MagicProjectile 컴포넌트를 가져와 데이터로 초기화하고 발사.
             if (projectileGO.TryGetComponent<MagicMissile>(out MagicMissile projectile))

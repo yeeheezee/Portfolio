@@ -9,21 +9,25 @@ namespace WizardBrawl.Enemy
     /// </summary>
     public class BossAI : MonoBehaviour
     {
-        // 보스의 상태 정의
-        private enum State { Idle, MaintainingDistance, Attacking, Cooldown }
+        // Cooldown 상태를 제거. 스킬별 쿨타임으로 관리하므로 전역 쿨타임은 불필요.
+        private enum State { Idle, MaintainingDistance, Attacking }
         private State _currentState;
 
-        [Header("AI 행동 설정")]
-        [SerializeField] private float _optimalDistance = 15f; // 유지하려는 최적 거리
-        [SerializeField] private float _distanceTolerance = 2f; // 최적 거리에서 허용 오차
+        [Header("AI 행동 설정")] 
+        // 유지하려는 최적 거리
+        [SerializeField] private float _optimalDistance = 15f;
+        // 최적 거리에서 허용 오차
+        [SerializeField] private float _distanceTolerance = 2f;
+        //이동 속도
         [SerializeField] private float _moveSpeed = 5f;
-
-        [Header("공격 타이밍")]
-        [SerializeField] private float _attackCooldown = 2.0f; // 공격 패턴이 끝난 후 최소 휴식 시간
 
         // --- 내부 참조 변수 ---
         private Transform _playerTransform;
         private BossAttackCaster _attackCaster;
+        private Coroutine _attackCoroutine; // 공격 코루틴을 제어하기 위한 변수
+
+        // 공격 패턴 제어를 위한 변수
+        private int _standardAttackCount = 0; // 일반 공격 횟수 카운트
 
         private void Awake()
         {
@@ -32,12 +36,10 @@ namespace WizardBrawl.Enemy
 
         private void Start()
         {
-            // 플레이어 태그 탐색
             GameObject player = GameObject.FindWithTag("Player");
             if (player != null)
             {
                 _playerTransform = player.transform;
-                // 초기 상태 설정
                 TransitionToState(State.MaintainingDistance);
             }
             else
@@ -51,50 +53,55 @@ namespace WizardBrawl.Enemy
         {
             if (_playerTransform == null) return;
 
-            // 현재 상태에 따라 행동 실행
             switch (_currentState)
             {
                 case State.Idle:
-                    // 플레이어를 찾으면 거리 유지 상태로 전환
                     break;
+
                 case State.MaintainingDistance:
+                    // 추격 상태에서는 플레이어와의 거리를 확인하고 최적의 거리로 이동
                     LookAtPlayer();
                     MaintainOptimalDistance();
-                    // 최적 거리가 유지되면 공격 상태로 전환
                     if (IsAtOptimalDistance())
                     {
                         TransitionToState(State.Attacking);
                     }
                     break;
+
                 case State.Attacking:
-                    // 공격 패턴 실행 (코루틴으로 처리)
-                    break;
-                case State.Cooldown:
-                    // 쿨타임 중에는 플레이어를 바라보기만 함
+                    // 공격 상태에서는 플레이어를 계속 주시하고, 거리가 멀어지면 추격 상태로 돌아감.
                     LookAtPlayer();
+                    if (!IsAtOptimalDistance())
+                    {
+                        TransitionToState(State.MaintainingDistance);
+                    }
                     break;
             }
         }
 
         private void TransitionToState(State newState)
         {
+            if (_currentState == newState) return;
+
             _currentState = newState;
-            // 상태 전환 시 필요한 로직 실행
+
+            // 상태 전환 시 코루틴을 명확하게 제어
+            // 기존 공격 코루틴이 있다면 중지
+            if (_attackCoroutine != null)
+            {
+                StopCoroutine(_attackCoroutine);
+                _attackCoroutine = null;
+            }
+
             switch (_currentState)
             {
-                case State.Idle:
-                    // 할 일 없음
-                    break;
-                case State.MaintainingDistance:
-                    // 할 일 없음
-                    break;
                 case State.Attacking:
-                    // 공격 코루틴 시작
-                    StartCoroutine(AttackPatternCoroutine());
+                    // 새로운 공격 코루틴 시작
+                    _attackCoroutine = StartCoroutine(AttackDecisionCoroutine());
                     break;
-                case State.Cooldown:
-                    // 쿨타임 코루틴 시작
-                    StartCoroutine(CooldownCoroutine());
+
+                default:
+                    // 다른 상태에서는 특별히 할 일 없음
                     break;
             }
         }
@@ -136,30 +143,46 @@ namespace WizardBrawl.Enemy
 
         // --- 코루틴 기반 패턴 관리 ---
 
-        private IEnumerator AttackPatternCoroutine()
+        /// <summary>
+        /// 공격 상태(Attacking)인 동안 계속 실행되며,
+        /// 스킬 쿨타임을 확인하여 최적의 공격을 결정하는 지능적인 코루틴.
+        /// </summary>
+        private IEnumerator AttackDecisionCoroutine()
         {
-            // 지금은 50% 확률로 일반 공격, 50% 확률로 패링불가 공격을 시도
-            if (Random.value < 0.5f)
+            LookAtPlayer();
+            yield return null;
+            // 공격 상태인 동안 이 루프는 계속 반복됨.
+            while (_currentState == State.Attacking)
             {
-                _attackCaster.PerformStandardAttack();
+                // --- 공격 결정 로직 (우선순위 기반) ---
+
+                // 우선순위 1: "일반 공격 2번 후, 패링 불가 공격이 준비되었는가?"
+                if (_standardAttackCount >= 2 && _attackCaster.IsUnparryableAttackReady)
+                {
+                    _attackCaster.PerformUnparryableAttack();
+                    _standardAttackCount = 0; // 카운트 리셋
+                    yield return new WaitForSeconds(2.0f); // 패링불가 공격의 후딜레이
+                }
+                // 우선순위 2: "강력한 공격(Heavy)이 준비되었는가?"
+                else if (_attackCaster.IsHeavyAttackReady)
+                {
+                    _attackCaster.PerformHeavyAttack();
+                    yield return new WaitForSeconds(1.5f); // 강력한 공격의 후딜레이
+                }
+                // 우선순위 3: "일반 공격이 준비되었는가?"
+                else if (_attackCaster.IsStandardAttackReady)
+                {
+                    _attackCaster.PerformStandardAttack();
+                    _standardAttackCount++; // 일반 공격 카운트 증가
+                    yield return new WaitForSeconds(1.0f); // 일반 공격의 후딜레이
+                }
+                // 모든 공격이 쿨타임일 경우:
+                else
+                {
+                    // 아무것도 하지 않고 다음 프레임에 다시 결정 로직을 실행.
+                    yield return null;
+                }
             }
-            else
-            {
-                _attackCaster.PerformUnparryableAttack();
-            }
-
-            // 공격이 끝날 때까지 잠시 대기 (애니메이션 시간 등 고려)
-            yield return new WaitForSeconds(1.0f);
-
-            // 공격이 끝나면 쿨타임 상태로 전환
-            TransitionToState(State.Cooldown);
-        }
-
-        private IEnumerator CooldownCoroutine()
-        {
-            yield return new WaitForSeconds(_attackCooldown);
-            // 쿨타임이 끝나면 다시 거리 유지 상태로 돌아가 다음 공격을 준비
-            TransitionToState(State.MaintainingDistance);
         }
     }
 }

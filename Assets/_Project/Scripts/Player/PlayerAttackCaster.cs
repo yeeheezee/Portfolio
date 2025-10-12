@@ -15,6 +15,18 @@ namespace WizardBrawl.Player
         [SerializeField]
         [Tooltip("주 공격으로 사용할 마법의 데이터 에셋.")]
         private MagicData _primaryAttackMagic;
+        [Header("메인 카메라")]
+        [SerializeField]
+        [Tooltip("마법을 시전할 방향을 정할 메인카메라")]
+        private Camera _mainCamera;
+        private void Awake() // Start 대신 Awake 사용 권장
+        {
+            // BaseCaster의 Awake도 호출될 수 있으니, 필요한 초기화는 여기서
+            if (_mainCamera == null)
+            {
+                _mainCamera = Camera.main;
+            }
+        }
 
         /// <summary>
         /// 주 공격 마법 시전을 시도함.
@@ -22,7 +34,14 @@ namespace WizardBrawl.Player
         /// </summary>
         public void PerformAttack()
         {
-            UseSkill(_primaryAttackMagic);
+            if (_mainCamera == null)
+            {
+                Debug.LogError("메인 카메라가 없습니다!");
+                return;
+            }
+            Vector3 fireDirection = _mainCamera.transform.forward;
+            Debug.LogError(fireDirection);
+            UseSkill(_primaryAttackMagic, fireDirection);
         }
     }
 }
