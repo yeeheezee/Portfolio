@@ -40,7 +40,6 @@ namespace WizardBrawl.Player
                 return;
             }
             Vector3 fireDirection = _mainCamera.transform.forward;
-            Debug.LogError(fireDirection);
             UseSkill(_primaryAttackMagic, fireDirection);
         }
     }

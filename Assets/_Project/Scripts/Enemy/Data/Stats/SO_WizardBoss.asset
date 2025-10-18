@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6cd10ce192d0eb46a1c93a9f6507251, type: 3}
+  m_Name: SO_WizardBoss
+  m_EditorClassIdentifier: 
+  MoveSpeed: 5
+  RotationSpeed: 5
+  OptimalDistance: 15
+  DistanceTolerance: 2
+  StandardAttackCooldown: 1
+  HeavyAttackCooldown: 1.5
+  UnparryableAttackCooldown: 2
+  RestBetweenAttacks: 0.8
