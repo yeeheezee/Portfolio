@@ -18,6 +18,7 @@ namespace WizardBrawl.Player
         private PlayerMovement _playerMovement;
         private PlayerJump _playerJump;
         private PlayerAttackCaster _playerAttackCaster;
+        private MagicParry _manaParry;
 
         private void Awake()
         {
@@ -26,14 +27,14 @@ namespace WizardBrawl.Player
             _playerMovement = GetComponent<PlayerMovement>();
             _playerJump = GetComponent<PlayerJump>();
             _playerAttackCaster = GetComponent<PlayerAttackCaster>();
+            _manaParry = GetComponentInChildren<MagicParry>();
 
             //각 액션 발생 시 함수 호출되도록 구독
             _playerInput.actions["Move"].performed += context => _playerMovement.SetMoveInput(context.ReadValue<Vector2>());
             _playerInput.actions["Move"].canceled += context => _playerMovement.SetMoveInput(Vector2.zero);
-
             _playerInput.actions["Jump"].performed += context => _playerJump.PerformJump();
-
             _playerInput.actions["Fire"].performed += context => _playerAttackCaster.PerformAttack();
+            _playerInput.actions["Parry"].performed += context => _manaParry.AttemptParry();
         }
     }
 }

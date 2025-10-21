@@ -30,6 +30,10 @@ namespace WizardBrawl.Magic.Data
         [SerializeField]
         [Tooltip("마법 사용 후 재사용 대기시간.")]
         private float _cooldown = 1f;
+        
+        [SerializeField]
+        [Tooltip("이 마법을 플레이어가 패링할 수 있는지 여부.")]
+        private bool _isParryable = true;
 
         // --- Public Properties ---
         public string MagicName => _magicName;
@@ -37,6 +41,7 @@ namespace WizardBrawl.Magic.Data
         public Sprite Icon => _icon;
         public float ManaCost => _manaCost;
         public float Cooldown => _cooldown;
+        public bool IsParryable => _isParryable;
 
         /// <summary>
         /// 이 MagicData에 해당하는 마법 실행 로직

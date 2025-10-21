@@ -13,6 +13,7 @@ namespace WizardBrawl.Magic
     {
         private float _speed;
         private float _damage;
+        private bool _isParryable;
 
         private Rigidbody _rigidbody;
 
@@ -24,10 +25,11 @@ namespace WizardBrawl.Magic
         /// <summary>
         /// Effect로부터 최종 계산된 능력치를 받아 투사체를 초기화.
         /// </summary>
-        public void Initialize(float damage, float speed, float lifetime)
+        public void Initialize(float damage, float speed, float lifetime, bool isParryable)
         {
             _damage = damage;
             _speed = speed;
+            _isParryable = isParryable;
             // 지정된 시간이 지나면 이 게임 오브젝트를 파괴.
             Destroy(gameObject, lifetime);
         }
@@ -46,14 +48,31 @@ namespace WizardBrawl.Magic
         /// </summary>
         private void OnTriggerEnter(Collider other)
         {
-            // Health 컴포넌트를 가진 대상에게 피해를 줌.
-            if (other.TryGetComponent<Health>(out Health targetHealth))
+            // 패링 존과 충돌 확인
+            if (other.TryGetComponent<IParryable>(out var parryableObject))
             {
-                targetHealth.TakeDamage(_damage);
+                // 이 투사체가 패링 가능하다면, 패링 로직을 실행.
+                if (_isParryable)
+                {
+                    if (parryableObject.OnParrySuccess())
+                    {
+                        Destroy(gameObject);
+                    }
+                }
+                return;
             }
 
-            // 충돌한 대상이 누구든지 즉시 파괴됨.
-            Destroy(gameObject);
+            // 플레이어나 보스 충돌 확인
+            if (other.TryGetComponent<Health>(out var targetHealth))
+            {
+                targetHealth.TakeDamage(_damage);
+                Destroy(gameObject);
+            }
+            // 그 외 충돌
+            else
+            {
+                Destroy(gameObject);
+            }
         }
     }
 }

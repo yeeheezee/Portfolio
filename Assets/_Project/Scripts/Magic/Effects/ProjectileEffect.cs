@@ -45,7 +45,7 @@ namespace WizardBrawl.Magic.Effects
             // MagicProjectile 컴포넌트를 가져와 데이터로 초기화하고 발사.
             if (projectileGO.TryGetComponent<MagicMissile>(out MagicMissile projectile))
             {
-                projectile.Initialize(_data.Damage, _data.Speed, _data.Lifetime);
+                projectile.Initialize(_data.Damage, _data.Speed, _data.Lifetime, _data.IsParryable);
                 projectile.Launch(fireDirection);
             }
             else
