@@ -4,6 +4,9 @@ using WizardBrawl.Magic.Data;
 
 namespace WizardBrawl.Enemy
 {
+    /// <summary>
+    /// BossAI의 공격 명령을 받아 실제 마법을 시전함.
+    /// </summary>
     [RequireComponent(typeof(BossAI))]
     public class BossAttackCaster : BaseCaster
     {
@@ -11,28 +14,35 @@ namespace WizardBrawl.Enemy
         [SerializeField] private MagicData _standardAttack;
         [SerializeField] private MagicData _heavyAttack;
         [SerializeField] private MagicData _unparryableAttack;
-        // TODO: 연속 공격(콤보)을 위한 데이터 리스트 추가
 
-        // AI는 MagicData의 존재를 알 필요 없이, 이 프로퍼티만 확인하면 되도록 변경.
+        /// <summary>
+        /// 일반 공격이 사용 가능한 상태인지 여부.
+        /// </summary>
         public bool IsStandardAttackReady => IsSkillReady(_standardAttack);
+
+        /// <summary>
+        /// 강한 공격이 사용 가능한 상태인지 여부.
+        /// </summary>
         public bool IsHeavyAttackReady => IsSkillReady(_heavyAttack);
+
+        /// <summary>
+        /// 패링 불가 공격이 사용 가능한 상태인지 여부.
+        /// </summary>
         public bool IsUnparryableAttackReady => IsSkillReady(_unparryableAttack);
 
+        /// <summary>
+        /// 일반 공격을 수행함.
+        /// </summary>
+        public void PerformStandardAttack() => UseSkill(_standardAttack, transform.forward);
 
-        // AI가 호출할 메서드들
-        public void PerformStandardAttack()
-        {
-            UseSkill(_standardAttack, transform.forward);
-        }
+        /// <summary>
+        /// 강한 공격을 수행함.
+        /// </summary>
+        public void PerformHeavyAttack() => UseSkill(_heavyAttack, transform.forward);
 
-        public void PerformHeavyAttack()
-        {
-            UseSkill(_heavyAttack, transform.forward);
-        }
-
-        public void PerformUnparryableAttack()
-        {
-            UseSkill(_unparryableAttack, transform.forward);
-        }
+        /// <summary>
+        /// 패링 불가 공격을 수행함.
+        /// </summary>
+        public void PerformUnparryableAttack() => UseSkill(_unparryableAttack, transform.forward);
     }
 }

@@ -1,8 +1,7 @@
 namespace WizardBrawl.Core
 {
     /// <summary>
-    /// 패링될 수 있는 모든 객체가 구현해야 하는 인터페이스.
-    /// 투사체로부터 패링 성공/실패 이벤트를 전달받는 역할을 함.
+    /// 패링 가능한 모든 객체가 구현해야 하는 인터페이스.
     /// </summary>
     public interface IParryable
     {

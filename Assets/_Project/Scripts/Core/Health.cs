@@ -5,18 +5,21 @@ namespace WizardBrawl.Core
 {
 
     /// <summary>
-    /// 체력을 가진 개체의 생명력 관리.
+    /// 개체의 생명력(HP)을 관리하는 컴포넌트.
     /// </summary>
     public class Health : MonoBehaviour
     {
-        [SerializeField]
-        [Tooltip("최대 체력 설정.")]
-        private float _maxHealth = 100f;
+        [Header("체력 설정")]
+        [Tooltip("인스펙터에서 설정할 최대 체력 초기값. 0보다 커야 합니다.")]
+        [SerializeField] private float _initialMaxHealth = 100f;
 
         private bool _isDead = false;
+        /// <summary>
+        /// 이 개체의 최대 체력 값.
+        /// </summary>
 
         /// <summary>
-        /// 최대 체력.
+        /// 현재 이 개체의 사망 상태인지 여부.
         /// </summary>
         public float MaxHealth { get => _maxHealth; private set => _maxHealth = value; }
 
@@ -26,31 +29,40 @@ namespace WizardBrawl.Core
         public float CurrentHealth { get; private set; }
 
         /// <summary>
-        /// 체력이 0이 되었을 때 호출되는 이벤트.
+        /// 체력 변경 시 발생하는 이벤트. (현재 체력, 최대 체력)
+        /// </summary>
+        public event Action<float, float> OnHealthChanged;
+
+        /// <summary>
+        /// 체력이 0이 되어 사망 시 단 한 번 발생하는 이벤트.
         /// </summary>
         public event Action OnDeath;
 
         private void Awake()
         {
-            // 활성화 시 현재 체력을 최대 체력으로
             CurrentHealth = MaxHealth;
         }
 
         /// <summary>
-        /// 지정된 양만큼의 피해를 입음.
+        /// 지정된 양만큼 피해를 적용함.
         /// </summary>
-        /// <param name="damageAmount">받을 피해량.</param>
+        /// <param name="damageAmount">받을 피해량. 음수 값은 무시됨.</param>
         public void TakeDamage(float damageAmount)
         {
             // 사망 상태일 경우, 더 이상 피해를 받지 않도록 처리.
             if (_isDead) return;
 
-            // 체력이 0 미만으로 내려가지 않도록 보정.
             CurrentHealth = Mathf.Max(CurrentHealth - damageAmount, 0f);
+        /// <summary>
+        /// 지정된 양만큼 체력을 회복함.
+        /// </summary>
+        /// <param name="healAmount">회복할 체력량. 음수 값은 무시됨.</param>
 
-            Debug.Log($"{gameObject.name} took {damageAmount} damage. Current Health : {CurrentHealth}");
+        /// <summary>
+        /// 체력 값을 안전하게 변경하고 관련 이벤트를 호출함.
+        /// </summary>
+        /// <param name="newHealthValue">설정할 새로운 체력 값.</param>
 
-            // 체력이 0 이하가 되면 사망.
             if (CurrentHealth <= 0f)
             {
                 Die();
@@ -65,7 +77,6 @@ namespace WizardBrawl.Core
             _isDead = true;
             Debug.Log($"{gameObject.name} has died.");
 
-            // OnDeath 이벤트를 호출하여 사망을 통지.
             OnDeath?.Invoke();
         }
     }

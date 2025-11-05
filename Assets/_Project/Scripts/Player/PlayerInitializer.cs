@@ -20,16 +20,17 @@ namespace WizardBrawl.Player
         private PlayerAttackCaster _playerAttackCaster;
         private MagicParry _manaParry;
 
+        /// <summary>
+        /// 컴포넌트들을 캐싱하고 Input System의 액션과 각 컴포넌트의 메서드를 연결(바인딩)함.
+        /// </summary>
         private void Awake()
         {
-            // 필요한 모든 컴포넌트를 가져옵니다.
             _playerInput = GetComponent<PlayerInput>();
             _playerMovement = GetComponent<PlayerMovement>();
             _playerJump = GetComponent<PlayerJump>();
             _playerAttackCaster = GetComponent<PlayerAttackCaster>();
             _manaParry = GetComponentInChildren<MagicParry>();
 
-            //각 액션 발생 시 함수 호출되도록 구독
             _playerInput.actions["Move"].performed += context => _playerMovement.SetMoveInput(context.ReadValue<Vector2>());
             _playerInput.actions["Move"].canceled += context => _playerMovement.SetMoveInput(Vector2.zero);
             _playerInput.actions["Jump"].performed += context => _playerJump.PerformJump();

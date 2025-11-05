@@ -12,5 +12,7 @@ namespace WizardBrawl.Core
         /// </summary>
         /// <param name="caster">마법을 시전하는 게임 오브젝트.</param>
         void Execute(GameObject caster, Vector3 fireDirection);
+        /// <param name="spawnPoint">마법이 생성될 위치.</param>
+        /// <param name="fireDirection">마법이 발사될 방향.</param>
     }
 }

@@ -5,27 +5,23 @@ using WizardBrawl.Core;
 namespace WizardBrawl.Player
 {
     /// <summary>
-    /// 플레이어의 마나 패링 시스템을 담당.
+    /// 플레이어의 마법 패링 시스템. IParryable을 구현함.
     /// </summary>
     public class MagicParry : MonoBehaviour, IParryable
     {
         [Header("패링 설정")]
-
         [Tooltip("패링 판정이 활성화되는 시간 (초)")]
-        [SerializeField] 
-        private float _parryWindow = 0.3f;
+        [SerializeField] private float _parryWindow = 0.3f;
 
         [Tooltip("패링 시도 시 소모되는 마나량")]
-        [SerializeField] 
-        private float _manaCost = 10f;
+        [SerializeField] private float _manaCost = 10f;
 
         [Tooltip("패링 성공 시 회복되는 마나량")]
-        [SerializeField] 
-        private float _manaGainOnSuccess = 30f;
+        [SerializeField] private float _manaGainOnSuccess = 30f;
 
         private Collider _parryCollider;
         private Mana _playerMana;
-        private bool _isParrying = false;
+        private bool _isParrying;
 
         private void Awake()
         {
@@ -34,20 +30,18 @@ namespace WizardBrawl.Player
 
             if (_parryCollider == null || _playerMana == null)
             {
-                Debug.LogError("필수 컴포넌트(Collider, Mana)를 찾을 수 없습니다!", this);
-                enabled = false; // 컴포넌트 비활성화
+                Debug.LogError("MagicParry에 필수 컴포넌트(Collider, Mana)를 찾을 수 없습니다!", this);
+                enabled = false;
                 return;
             }
-
             _parryCollider.enabled = false;
         }
 
         /// <summary>
-        /// 외부(입력 시스템)에서 호출하여 패링을 시도하는 메서드.
+        /// 패링을 시도함.
         /// </summary>
         public void AttemptParry()
         {
-            //패링이 불가능하거나 마나가 충분하지 않으면
             if (_isParrying || !_playerMana.IsManaAvailable(_manaCost)) return;
 
             StartCoroutine(ParryCoroutine());
@@ -65,8 +59,9 @@ namespace WizardBrawl.Player
         }
 
         /// <summary>
-        /// 투사체(MagicMissile)가 호출하는, 패링 성공 시 처리 메서드.
+        /// IParryable 인터페이스 구현. 패링 성공 시 호출됨.
         /// </summary>
+        /// <returns>패링 성공 시 투사체는 파괴되어야 하므로 true를 반환.</returns>
         public bool OnParrySuccess()
         {
             Debug.Log("패링 성공! 마나를 회복합니다.");
@@ -74,5 +69,9 @@ namespace WizardBrawl.Player
 
             return true;
         }
+
+        /// <summary>
+        /// 정해진 시간 동안만 패링 판정을 활성화하는 코루틴.
+        /// </summary>
     }
 }

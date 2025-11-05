@@ -17,32 +17,31 @@ namespace WizardBrawl.Magic.Effects
         }
 
         /// <summary>
-        /// 마법 효과 실행.
+        /// 투사체 프리팹을 생성하고 발사함.
         /// </summary>
         public void Execute(GameObject caster, Vector3 fireDirection)
+        /// <param name="caster">마법을 시전한 주체.</param>
+        /// <param name="spawnPoint">마법 효과가 시작될 위치와 방향.</param>
+        /// <param name="fireDirection">마법이 나아갈 초기 방향.</param>
         {
-            // 프리팹이 설정되지 않았으면 경고 출력 후 종료.
             if (_data.ProjectilePrefab == null)
             {
-                Debug.LogWarning($"마법 '{_data.MagicName}'에 투사체 프리팹이 미설정");
+                Debug.LogWarning($"마법 '{_data.MagicName}'에 투사체 프리팹이 설정되지 않았습니다.");
                 return;
             }
 
-            // 발사 위치를 찾음.
             Transform spawnPoint = caster.transform.Find("MagicSpawnPoint");
             if (spawnPoint == null)
             {
                 spawnPoint = caster.transform; // 못 찾으면 시전자 위치에서 발사.
             }
 
-            // 프리팹 인스턴스화.
             GameObject projectileGO = Object.Instantiate(
                 _data.ProjectilePrefab,
                 spawnPoint.position,
                 Quaternion.LookRotation(fireDirection)
             );
 
-            // MagicProjectile 컴포넌트를 가져와 데이터로 초기화하고 발사.
             if (projectileGO.TryGetComponent<MagicMissile>(out MagicMissile projectile))
             {
                 projectile.Initialize(_data.Damage, _data.Speed, _data.Lifetime, _data.IsParryable);
@@ -50,7 +49,7 @@ namespace WizardBrawl.Magic.Effects
             }
             else
             {
-                Debug.LogError($"'{_data.ProjectilePrefab.name}' 프리팹에 MagicProjectile 스크립트 미설정");
+                Debug.LogError($"'{_data.ProjectilePrefab.name}' 프리팹에 MagicMissile 컴포넌트가 없습니다.");
             }
         }
     }
