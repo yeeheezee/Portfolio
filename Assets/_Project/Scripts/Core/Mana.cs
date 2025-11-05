@@ -1,5 +1,5 @@
 using UnityEngine;
-using System; // Action 이벤트를 사용하기 위해 추가
+using System;
 
 namespace WizardBrawl.Core
 {
@@ -18,6 +18,7 @@ namespace WizardBrawl.Core
         /// <summary>
         /// 이 개체의 최대 마나 값.
         /// </summary>
+        public float MaxMana { get; private set; }
 
         /// <summary>
         /// 현재 마나.
@@ -31,7 +32,18 @@ namespace WizardBrawl.Core
 
         private void Awake()
         {
-            CurrentMana = _startMana;
+            if (_initialMaxMana <= 0)
+            {
+                Debug.LogError("최대 마나 초기값(_initialMaxMana)은 0보다 커야 합니다!", this);
+                _initialMaxMana = 100f;
+            }
+            MaxMana = _initialMaxMana;
+            CurrentMana = Mathf.Clamp(_startMana, 0f, MaxMana);
+        }
+
+        private void Start()
+        {
+            OnManaChanged?.Invoke(CurrentMana, MaxMana);
         }
 
         /// <summary>
@@ -41,6 +53,7 @@ namespace WizardBrawl.Core
         /// <returns>사용 가능하면 true, 아니면 false.</returns>
         public bool IsManaAvailable(float amount)
         {
+            if (amount < 0) return false;
             return CurrentMana >= amount;
         }
 
@@ -50,18 +63,8 @@ namespace WizardBrawl.Core
         /// <param name="amount">소모할 마나 양. 음수 값은 무시됨.</param>
         public void UseMana(float amount)
         {
-            if (!IsManaAvailable(amount))
-            {
-                Debug.LogWarning("마나가 부족하여 스킬을 사용할 수 없습니다.");
-                return;
-            }
-
-            CurrentMana -= amount;
-            // 마나가 0 미만으로 내려가지 않도록 보정.
-            if (CurrentMana < 0) CurrentMana = 0;
-
-            // 마나 변경 이벤트 호출
-            OnManaChanged?.Invoke(CurrentMana, _maxMana);
+            if (amount < 0) return;
+            SetMana(CurrentMana - amount);
         }
 
         /// <summary>
@@ -70,14 +73,22 @@ namespace WizardBrawl.Core
         /// <param name="amount">회복할 마나 양. 음수 값은 무시됨.</param>
         public void RestoreMana(float amount)
         {
-            CurrentMana += amount;
-            if (CurrentMana > _maxMana) CurrentMana = _maxMana;
+            if (amount < 0) return;
+            SetMana(CurrentMana + amount);
+        }
 
-            OnManaChanged?.Invoke(CurrentMana, _maxMana);
         /// <summary>
         /// 마나 값을 안전하게 변경하고 이벤트를 호출함.
         /// </summary>
         /// <param name="newManaValue">설정할 새로운 마나 값.</param>
+        private void SetMana(float newManaValue)
+        {
+            float newMana = Mathf.Clamp(newManaValue, 0f, MaxMana);
+            if (CurrentMana != newMana)
+            {
+                CurrentMana = newMana;
+                OnManaChanged?.Invoke(CurrentMana, MaxMana);
+            }
         }
     }
 }

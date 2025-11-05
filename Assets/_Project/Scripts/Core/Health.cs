@@ -3,7 +3,6 @@ using System;
 
 namespace WizardBrawl.Core
 {
-
     /// <summary>
     /// 개체의 생명력(HP)을 관리하는 컴포넌트.
     /// </summary>
@@ -13,15 +12,15 @@ namespace WizardBrawl.Core
         [Tooltip("인스펙터에서 설정할 최대 체력 초기값. 0보다 커야 합니다.")]
         [SerializeField] private float _initialMaxHealth = 100f;
 
-        private bool _isDead = false;
         /// <summary>
         /// 이 개체의 최대 체력 값.
         /// </summary>
+        public float MaxHealth { get; private set; }
 
         /// <summary>
         /// 현재 이 개체의 사망 상태인지 여부.
         /// </summary>
-        public float MaxHealth { get => _maxHealth; private set => _maxHealth = value; }
+        public bool IsDead { get; private set; } = false;
 
         /// <summary>
         /// 현재 체력.
@@ -40,7 +39,18 @@ namespace WizardBrawl.Core
 
         private void Awake()
         {
+            if (_initialMaxHealth <= 0)
+            {
+                Debug.LogError("최대 체력 초기값(_initialMaxHealth)은 0보다 커야 합니다!", this);
+                _initialMaxHealth = 100f;
+            }
+            MaxHealth = _initialMaxHealth;
             CurrentHealth = MaxHealth;
+        }
+
+        private void Start()
+        {
+            OnHealthChanged?.Invoke(CurrentHealth, MaxHealth);
         }
 
         /// <summary>
@@ -49,21 +59,34 @@ namespace WizardBrawl.Core
         /// <param name="damageAmount">받을 피해량. 음수 값은 무시됨.</param>
         public void TakeDamage(float damageAmount)
         {
-            // 사망 상태일 경우, 더 이상 피해를 받지 않도록 처리.
-            if (_isDead) return;
+            if (IsDead || damageAmount < 0) return;
+            SetHealth(CurrentHealth - damageAmount);
+        }
 
-            CurrentHealth = Mathf.Max(CurrentHealth - damageAmount, 0f);
         /// <summary>
         /// 지정된 양만큼 체력을 회복함.
         /// </summary>
         /// <param name="healAmount">회복할 체력량. 음수 값은 무시됨.</param>
+        public void Heal(float healAmount)
+        {
+            if (IsDead || healAmount < 0) return;
+            SetHealth(CurrentHealth + healAmount);
+        }
 
         /// <summary>
         /// 체력 값을 안전하게 변경하고 관련 이벤트를 호출함.
         /// </summary>
         /// <param name="newHealthValue">설정할 새로운 체력 값.</param>
+        private void SetHealth(float newHealthValue)
+        {
+            float newHealth = Mathf.Clamp(newHealthValue, 0f, MaxHealth);
+            if (CurrentHealth != newHealth)
+            {
+                CurrentHealth = newHealth;
+                OnHealthChanged?.Invoke(CurrentHealth, MaxHealth);
+            }
 
-            if (CurrentHealth <= 0f)
+            if (CurrentHealth <= 0f && !IsDead)
             {
                 Die();
             }
@@ -74,9 +97,7 @@ namespace WizardBrawl.Core
         /// </summary>
         private void Die()
         {
-            _isDead = true;
-            Debug.Log($"{gameObject.name} has died.");
-
+            IsDead = true;
             OnDeath?.Invoke();
         }
     }
