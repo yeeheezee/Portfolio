@@ -37,6 +37,7 @@ namespace WizardBrawl.Magic
             skill.CreateEffect().Execute(gameObject, fireDirection);
             _cooldownTimers[skill] = Time.time;
 
+            skill.CreateEffect().Execute(gameObject, _magicSpawnPoint, fireDirection);
         }
 
         /// <summary>
