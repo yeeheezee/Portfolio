@@ -45,15 +45,9 @@ namespace WizardBrawl.Magic
 
         private void OnTriggerEnter(Collider other)
         {
-            if (other.TryGetComponent<IParryable>(out var parryableObject))
+            if (_isParryable && other.TryGetComponent<IParryable>(out var parryableObject))
             {
-                if (_isParryable)
-                {
-                    if (parryableObject.OnParrySuccess())
-                    {
-                        Destroy(gameObject);
-                    }
-                }
+                if (parryableObject.OnParrySuccess()) Destroy(gameObject);
                 return;
             }
 
@@ -61,12 +55,11 @@ namespace WizardBrawl.Magic
             {
                 targetHealth.TakeDamage(_damage);
                 Destroy(gameObject);
+                return;
             }
-            else
-            {
-                Destroy(gameObject);
-            }
+
             // 그 외의 모든 것(벽, 바닥 등)과 충돌 시 파괴
+            Destroy(gameObject);
         }
     }
 }

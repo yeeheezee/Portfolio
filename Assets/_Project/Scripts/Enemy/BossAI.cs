@@ -83,16 +83,10 @@ namespace WizardBrawl.Enemy
             {
                 case State.MaintainingDistance:
                     MaintainOptimalDistance();
-                    if (IsAtOptimalDistance())
-                    {
-                        TransitionToState(State.Attacking);
-                    }
+                    if (IsAtOptimalDistance()) TransitionToState(State.Attacking);
                     break;
                 case State.Attacking:
-                    if (!IsAtOptimalDistance())
-                    {
-                        TransitionToState(State.MaintainingDistance);
-                    }
+                    if (!IsAtOptimalDistance()) TransitionToState(State.MaintainingDistance);
                     break;
             }
         }
@@ -112,7 +106,6 @@ namespace WizardBrawl.Enemy
                 StopCoroutine(_attackCoroutine);
                 _attackCoroutine = null;
             }
-            // 새로운 상태에 따른 진입 로직을 처리.
             _currentState = newState;
             if (_currentState == State.Attacking)
             {
@@ -134,8 +127,8 @@ namespace WizardBrawl.Enemy
             }
             else if (distance < _stats.OptimalDistance - _stats.DistanceTolerance)
             {
-                Vector3 directionAwayFromPlayer = (transform.position - _playerTransform.position).normalized;
-                transform.position = Vector3.MoveTowards(transform.position, transform.position + directionAwayFromPlayer, _stats.MoveSpeed * Time.deltaTime);
+                Vector3 awayDir = (transform.position - _playerTransform.position).normalized;
+                transform.position = Vector3.MoveTowards(transform.position, transform.position + awayDir, _stats.MoveSpeed * Time.deltaTime);
             }
         }
 

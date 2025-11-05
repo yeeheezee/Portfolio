@@ -43,19 +43,7 @@ namespace WizardBrawl.Player
         public void AttemptParry()
         {
             if (_isParrying || !_playerMana.IsManaAvailable(_manaCost)) return;
-
             StartCoroutine(ParryCoroutine());
-        }
-        private IEnumerator ParryCoroutine()
-        {
-            _isParrying = true;
-            _playerMana.UseMana(_manaCost);
-
-            _parryCollider.enabled = true;
-            yield return new WaitForSeconds(_parryWindow);
-            _parryCollider.enabled = false;
-
-            _isParrying = false;
         }
 
         /// <summary>
@@ -66,12 +54,20 @@ namespace WizardBrawl.Player
         {
             Debug.Log("패링 성공! 마나를 회복합니다.");
             _playerMana.RestoreMana(_manaGainOnSuccess);
-
             return true;
         }
 
         /// <summary>
         /// 정해진 시간 동안만 패링 판정을 활성화하는 코루틴.
         /// </summary>
+        private IEnumerator ParryCoroutine()
+        {
+            _isParrying = true;
+            _playerMana.UseMana(_manaCost);
+            _parryCollider.enabled = true;
+            yield return new WaitForSeconds(_parryWindow);
+            _parryCollider.enabled = false;
+            _isParrying = false;
+        }
     }
 }

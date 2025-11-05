@@ -15,9 +15,11 @@ namespace WizardBrawl.Player
 
         [Header("메인 카메라")]
         [Tooltip("마법을 시전할 방향을 정할 메인카메라")]
-        private Camera _mainCamera;
-        private void Awake() // Start 대신 Awake 사용 권장
+        [SerializeField] private Camera _mainCamera;
+
+        protected override void Awake()
         {
+            base.Awake();
             if (_mainCamera == null)
             {
                 _mainCamera = Camera.main;
@@ -34,8 +36,7 @@ namespace WizardBrawl.Player
                 Debug.LogError("메인 카메라가 할당되지 않았습니다!", this);
                 return;
             }
-            Vector3 fireDirection = _mainCamera.transform.forward;
-            UseSkill(_primaryAttackMagic, fireDirection);
+            UseSkill(_primaryAttackMagic, _mainCamera.transform.forward);
         }
     }
 }

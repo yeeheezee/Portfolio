@@ -30,7 +30,6 @@ namespace WizardBrawl.Player
         /// </summary>
         public bool IsGrounded { get; private set; }
 
-        private Vector3 _startPoint; // 시작 지점 계산
         private Rigidbody _rb;
         private PlayerMovement _playerMovement;
 
@@ -42,8 +41,6 @@ namespace WizardBrawl.Player
 
         private void FixedUpdate()
         {
-            _startPoint = transform.position + groundCheckOffset;
-
             CheckIfGrounded();
         }
 
@@ -64,19 +61,18 @@ namespace WizardBrawl.Player
         /// </summary>
         private void CheckIfGrounded()
         {
-            IsGrounded = Physics.Raycast(_startPoint, Vector3.down, groundCheckDistance, groundLayer);
+            Vector3 startPoint = transform.position + groundCheckOffset;
+            IsGrounded = Physics.Raycast(startPoint, Vector3.down, groundCheckDistance, groundLayer);
         }
+
         /// <summary>
         /// Scene 뷰에서 지면 감지 Raycast를 시각적으로 표시함.
         /// </summary>
         private void OnDrawGizmosSelected()
         {
-            Color transparentGreen = new Color(0.0f, 1.0f, 0.0f, 0.35f);
-            Color transparentRed = new Color(1.0f, 0.0f, 0.0f, 0.35f);
-
-            Gizmos.color = IsGrounded ? transparentGreen : transparentRed;
-
-            Gizmos.DrawLine(_startPoint, _startPoint + Vector3.down * groundCheckDistance);
+            Vector3 startPoint = transform.position + groundCheckOffset;
+            Gizmos.color = IsGrounded ? Color.green : Color.red;
+            Gizmos.DrawLine(startPoint, startPoint + Vector3.down * groundCheckDistance);
         }
     }
 }

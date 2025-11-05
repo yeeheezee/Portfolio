@@ -6,7 +6,7 @@ namespace WizardBrawl.Enemy
     /// <summary>
     /// 보스의 생명 주기를 관리하고 사망 이벤트에 반응함.
     /// </summary>
-    [RequireComponent(typeof(Health))] // Health 컴포넌트가 반드시 필요함을 명시.
+    [RequireComponent(typeof(Health))]
     public class Boss : MonoBehaviour
     {
         private Health _health;

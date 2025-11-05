@@ -30,19 +30,13 @@ namespace WizardBrawl.Magic
         {
             if (skill == null)
             {
-                Debug.LogError("시도한 스킬(MagicData)이 할당되지 않았습니다!");
-                return;
-            }
-            if (!IsSkillReady(skill))
-            {
-                Debug.LogWarning("스킬 쿨타임이 아직 차지 않았습니다!"); 
+                Debug.LogError("시도한 스킬(MagicData)이 할당되지 않았습니다! 인스펙터를 확인해주세요.", this);
                 return;
             }
 
             skill.CreateEffect().Execute(gameObject, fireDirection);
             _cooldownTimers[skill] = Time.time;
 
-            Debug.Log($"'{gameObject.name}'이(가) 스킬 '{skill.MagicName}' 사용");
         }
 
         /// <summary>
