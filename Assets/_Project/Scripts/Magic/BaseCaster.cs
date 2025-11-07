@@ -1,13 +1,14 @@
 using UnityEngine;
 using System.Collections.Generic;
 using WizardBrawl.Magic.Data;
-using System.IO.Pipes;
+using WizardBrawl.Core;
 
 namespace WizardBrawl.Magic
 {
     /// <summary>
     /// 마법 시전의 공통 기능(쿨타임, 마나 소모)을 제공하는 추상 클래스.
     /// </summary>
+    [RequireComponent(typeof(Mana))]
     public abstract class BaseCaster : MonoBehaviour
     {
         [Header("발사 위치")]
@@ -19,7 +20,17 @@ namespace WizardBrawl.Magic
         /// </summary>
         public Transform MagicSpawnPoint => _magicSpawnPoint;
 
+        private Mana _mana;
         private Dictionary<MagicData, float> _cooldownTimers = new Dictionary<MagicData, float>();
+
+        protected virtual void Awake()
+        {
+            _mana = GetComponent<Mana>();
+            if (_magicSpawnPoint == null)
+            {
+                _magicSpawnPoint = transform;
+            }
+        }
 
         /// <summary>
         /// 마법 스킬을 시전함.
@@ -34,10 +45,11 @@ namespace WizardBrawl.Magic
                 return;
             }
 
-            skill.CreateEffect().Execute(gameObject, fireDirection);
-            _cooldownTimers[skill] = Time.time;
+            if (!CanUseSkill(skill)) return;
 
+            _mana.UseMana(skill.ManaCost);
             skill.CreateEffect().Execute(gameObject, _magicSpawnPoint, fireDirection);
+            _cooldownTimers[skill] = Time.time;
         }
 
         /// <summary>
@@ -57,5 +69,11 @@ namespace WizardBrawl.Magic
         /// </summary>
         /// <param name="skill">검사할 마법 데이터.</param>
         /// <returns>사용 가능하면 true, 아니면 false.</returns>
+        private bool CanUseSkill(MagicData skill)
+        {
+            if (!IsSkillReady(skill)) return false;
+            if (!_mana.IsManaAvailable(skill.ManaCost)) return false;
+            return true;
+        }
     }
 }

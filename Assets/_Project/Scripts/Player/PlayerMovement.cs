@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace WizardBrawl.Player
 {
@@ -53,39 +52,45 @@ namespace WizardBrawl.Player
         {
             if (!CanMove)
             {
-                _rb.linearVelocity = new Vector3(0f, _rb.linearVelocity.y, 0f); // Y축 속도는 유지
+                StopMovement();
                 return;
             }
 
-            HandleMovement();
+            CalculateTargetDirection();
             HandleRotation();
+
+            if (_playerJump.IsGrounded)
+            {
+                ApplyGroundedMovement();
+            }
+            // TODO: 공중 이동 제어(Air Control) 로직 추가.
         }
 
         /// <summary>
         /// 현재 입력과 카메라 방향을 바탕으로 월드 좌표계의 목표 이동 방향을 계산함.
         /// </summary>
-        private void HandleMovement()
+        private void CalculateTargetDirection()
         {
             Vector3 camForward = _mainCameraTransform.forward;
             Vector3 camRight = _mainCameraTransform.right;
             camForward.y = 0;
             camRight.y = 0;
             _targetDirection = (camForward.normalized * _moveInput.y + camRight.normalized * _moveInput.x).normalized;
+        }
 
-            if (_playerJump.IsGrounded)
-            {
-                Vector3 targetVelocity = _targetDirection * moveSpeed;
-                Vector3 velocityChange = (targetVelocity - new Vector3(_rb.linearVelocity.x, 0f, _rb.linearVelocity.z));
         /// <summary>
         /// 계산된 목표 방향으로 이동하도록 Rigidbody에 힘을 적용함.
         /// </summary>
+        private void ApplyGroundedMovement()
+        {
+            Vector3 targetVelocity = _targetDirection * moveSpeed;
+            Vector3 velocityChange = (targetVelocity - new Vector3(_rb.linearVelocity.x, 0f, _rb.linearVelocity.z));
 
             velocityChange.x = Mathf.Clamp(velocityChange.x, -maxVelocityChange, maxVelocityChange);
             velocityChange.z = Mathf.Clamp(velocityChange.z, -maxVelocityChange, maxVelocityChange);
             velocityChange.y = 0;
 
-                _rb.AddForce(velocityChange, ForceMode.VelocityChange);
-            }
+            _rb.AddForce(velocityChange, ForceMode.VelocityChange);
         }
 
         /// <summary>
@@ -102,5 +107,9 @@ namespace WizardBrawl.Player
         /// <summary>
         /// 캐릭터의 수평 이동을 즉시 멈춤.
         /// </summary>
+        private void StopMovement()
+        {
+            _rb.linearVelocity = new Vector3(0f, _rb.linearVelocity.y, 0f);
+        }
     }
 }

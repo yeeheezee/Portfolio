@@ -72,13 +72,11 @@ namespace WizardBrawl.Enemy
             }
         }
 
-        private void Update()
         /// <summary>
         /// AI의 상태를 현재 조건에 맞게 갱신함.
         /// </summary>
+        private void UpdateState()
         {
-            if (_playerTransform == null || _currentState == State.Idle) return;
-            LookAtPlayer();
             switch (_currentState)
             {
                 case State.MaintainingDistance:
@@ -98,9 +96,6 @@ namespace WizardBrawl.Enemy
         private void TransitionToState(State newState)
         {
             if (_currentState == newState) return;
-
-            _currentState = newState;
-
             if (_attackCoroutine != null)
             {
                 StopCoroutine(_attackCoroutine);
@@ -109,9 +104,7 @@ namespace WizardBrawl.Enemy
             _currentState = newState;
             if (_currentState == State.Attacking)
             {
-                case State.Attacking:
-                    _attackCoroutine = StartCoroutine(AttackDecisionCoroutine());
-                    break;
+                _attackCoroutine = StartCoroutine(AttackDecisionCoroutine());
             }
         }
 
