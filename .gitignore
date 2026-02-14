@@ -97,3 +97,10 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+
+# Local planning docs (do not commit)
+/GAMEPLAY_DECISION_2W_SPRINT.md
+/SPRINT_14D_PROGRESS_ROADMAP.md
+
+# Local portfolio docs (do not commit)
+/Docs/

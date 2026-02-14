@@ -21,16 +21,23 @@ namespace WizardBrawl.Player
 
         private Collider _parryCollider;
         private Mana _playerMana;
+        private PlayerElementSlot _playerElementSlot;
         private bool _isParrying;
 
         private void Awake()
         {
             _parryCollider = GetComponent<Collider>();
             _playerMana = GetComponentInParent<Mana>();
+            _playerElementSlot = GetComponentInParent<PlayerElementSlot>();
 
-            if (_parryCollider == null || _playerMana == null)
+            if (_playerElementSlot == null && _playerMana != null)
             {
-                Debug.LogError("MagicParry에 필수 컴포넌트(Collider, Mana)를 찾을 수 없습니다!", this);
+                _playerElementSlot = _playerMana.gameObject.AddComponent<PlayerElementSlot>();
+            }
+
+            if (_parryCollider == null || _playerMana == null || _playerElementSlot == null)
+            {
+                Debug.LogError("MagicParry에 필수 컴포넌트(Collider, Mana, PlayerElementSlot)를 찾을 수 없습니다!", this);
                 enabled = false;
                 return;
             }
@@ -49,11 +56,13 @@ namespace WizardBrawl.Player
         /// <summary>
         /// IParryable 인터페이스 구현. 패링 성공 시 호출됨.
         /// </summary>
+        /// <param name="parriedElement">패링으로 획득한 속성.</param>
         /// <returns>패링 성공 시 투사체는 파괴되어야 하므로 true를 반환.</returns>
-        public bool OnParrySuccess()
+        public bool OnParrySuccess(ElementType parriedElement)
         {
             Debug.Log("패링 성공! 마나를 회복합니다.");
             _playerMana.RestoreMana(_manaGainOnSuccess);
+            _playerElementSlot.SaveFromParry(parriedElement);
             return true;
         }
 

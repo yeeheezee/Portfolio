@@ -12,6 +12,7 @@ namespace WizardBrawl.Magic
         private float _speed;
         private float _damage;
         private bool _isParryable;
+        private ElementType _parryElement = ElementType.None;
         private Rigidbody _rigidbody;
 
         private void Awake()
@@ -26,11 +27,13 @@ namespace WizardBrawl.Magic
         /// <param name="speed">이동 속도.</param>
         /// <param name="lifetime">최대 생존 시간.</param>
         /// <param name="isParryable">패링 가능 여부.</param>
-        public void Initialize(float damage, float speed, float lifetime, bool isParryable)
+        /// <param name="parryElement">패링 성공 시 플레이어가 획득할 속성.</param>
+        public void Initialize(float damage, float speed, float lifetime, bool isParryable, ElementType parryElement)
         {
             _damage = damage;
             _speed = speed;
             _isParryable = isParryable;
+            _parryElement = parryElement;
             Destroy(gameObject, lifetime);
         }
 
@@ -47,7 +50,7 @@ namespace WizardBrawl.Magic
         {
             if (_isParryable && other.TryGetComponent<IParryable>(out var parryableObject))
             {
-                if (parryableObject.OnParrySuccess()) Destroy(gameObject);
+                if (parryableObject.OnParrySuccess(_parryElement)) Destroy(gameObject);
                 return;
             }
 

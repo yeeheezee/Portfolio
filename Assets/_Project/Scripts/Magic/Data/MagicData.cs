@@ -28,12 +28,16 @@ namespace WizardBrawl.Magic.Data
         [Tooltip("이 마법을 플레이어가 패링할 수 있는지 여부.")]
         [SerializeField] private bool _isParryable = true;
 
+        [Tooltip("패링 성공 시 플레이어가 획득하는 속성.")]
+        [SerializeField] private ElementType _parryElement = ElementType.None;
+
         public string MagicName => _magicName;
         public string Description => _description;
         public Sprite Icon => _icon;
         public float ManaCost => _manaCost;
         public float Cooldown => _cooldown;
         public bool IsParryable => _isParryable;
+        public ElementType ParryElement => _parryElement;
 
         /// <summary>
         /// 이 데이터에 맞는 마법 실행 로직(IMagicEffect)을 생성하여 반환.

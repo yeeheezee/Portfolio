@@ -38,7 +38,7 @@ namespace WizardBrawl.Magic.Effects
 
             if (projectileGO.TryGetComponent<MagicMissile>(out var projectile))
             {
-                projectile.Initialize(_data.Damage, _data.Speed, _data.Lifetime, _data.IsParryable);
+                projectile.Initialize(_data.Damage, _data.Speed, _data.Lifetime, _data.IsParryable, _data.ParryElement);
                 projectile.Launch(fireDirection);
             }
             else

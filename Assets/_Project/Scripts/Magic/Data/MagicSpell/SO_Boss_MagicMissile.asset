@@ -17,6 +17,8 @@ MonoBehaviour:
   _icon: {fileID: 0}
   _manaCost: 0
   _cooldown: 1.5
+  _isParryable: 1
+  _parryElement: 1
   _projectilePrefab: {fileID: 887699550506029655, guid: 055135e1c426a5b418c9b19a89cf6b64, type: 3}
   _damage: 10
   _speed: 15
