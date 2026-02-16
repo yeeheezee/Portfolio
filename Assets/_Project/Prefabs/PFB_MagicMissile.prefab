@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 997236850122989601}
   - component: {fileID: 1655173705306111174}
   - component: {fileID: 1159518300388021835}
+  - component: {fileID: 7452705816689641415}
   m_Layer: 0
   m_Name: PFB_MagicMissile
   m_TagString: Untagged
@@ -147,5 +148,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0b9daeb75e2a09d488efb7e8b936349d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &7452705816689641415
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 887699550506029655}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52b8f8bf8ff64ddfbc35dc7f48686264, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

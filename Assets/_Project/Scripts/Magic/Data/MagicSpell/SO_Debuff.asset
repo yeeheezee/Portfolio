@@ -22,7 +22,12 @@ MonoBehaviour:
   _debuffType: 0
   _duration: 3
   _magnitude: 0.2
-  _radius: 2.5
+  _projectilePrefab: {fileID: 887699550506029655, guid: 055135e1c426a5b418c9b19a89cf6b64, type: 3}
+  _projectileSpeed: 10
+  _projectileLifetime: 3
   _targetLayers:
     serializedVersion: 2
     m_Bits: 4294967295
+  _burstRadius: 2.8
+  _burstSlowDuration: 1.5
+  _burstSlowStrength: 0.3

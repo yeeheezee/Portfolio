@@ -1,11 +1,12 @@
 using UnityEngine;
 using WizardBrawl.Core;
+using WizardBrawl.Magic;
 using WizardBrawl.Magic.Data;
 
 namespace WizardBrawl.Magic.Effects
 {
     /// <summary>
-    /// 범위 내 대상에게 디버프를 적용하는 실행 로직.
+    /// 디버프 전용 투사체를 생성하고 발사하는 실행 로직.
     /// </summary>
     public class DebuffEffect : IMagicEffect
     {
@@ -18,25 +19,31 @@ namespace WizardBrawl.Magic.Effects
 
         public void Execute(GameObject caster, Transform spawnPoint, Vector3 fireDirection)
         {
-            Collider[] hits = Physics.OverlapSphere(spawnPoint.position, _data.Radius, _data.TargetLayers);
-            int appliedCount = 0;
-
-            for (int i = 0; i < hits.Length; i++)
+            if (_data.ProjectilePrefab == null)
             {
-                GameObject target = hits[i].gameObject;
-                if (target == caster)
-                {
-                    continue;
-                }
-
-                if (target.TryGetComponent<IDebuffReceiver>(out IDebuffReceiver receiver))
-                {
-                    receiver.ApplyDebuff(_data.DebuffType, _data.Duration, _data.Magnitude);
-                    appliedCount++;
-                }
+                Debug.LogWarning($"마법 '{_data.MagicName}'에 디버프 투사체 프리팹이 설정되지 않았습니다.");
+                return;
             }
 
-            Debug.Log($"[DebuffEffect] type={_data.DebuffType}, applied={appliedCount}");
+            GameObject projectileGO = Object.Instantiate(
+                _data.ProjectilePrefab,
+                spawnPoint.position,
+                Quaternion.LookRotation(fireDirection)
+            );
+
+            if (!projectileGO.TryGetComponent<DebuffMissile>(out var projectile))
+            {
+                if (projectileGO.TryGetComponent<MagicMissile>(out var magicMissile))
+                {
+                    magicMissile.enabled = false;
+                }
+
+                projectile = projectileGO.AddComponent<DebuffMissile>();
+                Debug.LogWarning($"'{_data.ProjectilePrefab.name}' 프리팹에 DebuffMissile이 없어 런타임에서 자동 추가함.");
+            }
+
+            projectile.Initialize(_data, caster);
+            projectile.Launch(fireDirection);
         }
     }
 }
