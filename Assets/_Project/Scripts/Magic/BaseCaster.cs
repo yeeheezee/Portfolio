@@ -39,17 +39,26 @@ namespace WizardBrawl.Magic
         /// <param name="fireDirection">마법 발사 방향.</param>
         protected void UseSkill(MagicData skill, Vector3 fireDirection)
         {
+            TryUseSkill(skill, fireDirection);
+        }
+
+        /// <summary>
+        /// 마법 스킬 시도를 수행하고 성공 여부를 반환함.
+        /// </summary>
+        protected bool TryUseSkill(MagicData skill, Vector3 fireDirection)
+        {
             if (skill == null)
             {
                 Debug.LogError("시도한 스킬(MagicData)이 할당되지 않았습니다! 인스펙터를 확인해주세요.", this);
-                return;
+                return false;
             }
 
-            if (!CanUseSkill(skill)) return;
+            if (!CanUseSkill(skill)) return false;
 
             _mana.UseMana(skill.ManaCost);
             skill.CreateEffect().Execute(gameObject, _magicSpawnPoint, fireDirection);
             _cooldownTimers[skill] = Time.time;
+            return true;
         }
 
         /// <summary>
