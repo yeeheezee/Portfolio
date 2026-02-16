@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e400b1b48ed79774fa1677a2e81a5015, type: 3}
+  m_Name: SO_Debuff
+  m_EditorClassIdentifier: 
+  _magicName: New Magic
+  _description: 
+  _icon: {fileID: 0}
+  _manaCost: 10
+  _cooldown: 1
+  _isParryable: 1
+  _parryElement: 0
+  _debuffType: 0
+  _duration: 3
+  _magnitude: 0.2
+  _projectilePrefab: {fileID: 887699550506029655, guid: 055135e1c426a5b418c9b19a89cf6b64, type: 3}
+  _projectileSpeed: 10
+  _projectileLifetime: 3
+  _targetLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  _burstRadius: 2.8
+  _burstSlowDuration: 1.5
+  _burstSlowStrength: 0.3
