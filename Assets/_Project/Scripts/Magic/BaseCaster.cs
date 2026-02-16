@@ -74,6 +74,15 @@ namespace WizardBrawl.Magic
         }
 
         /// <summary>
+        /// 마나/쿨타임 기준으로 시전 가능 여부를 반환함.
+        /// </summary>
+        protected bool CanUseSkillNow(MagicData skill)
+        {
+            if (skill == null) return false;
+            return CanUseSkill(skill);
+        }
+
+        /// <summary>
         /// 스킬 시전에 필요한 게임플레이 조건(쿨타임, 마나)이 충족되었는지 확인함.
         /// </summary>
         /// <param name="skill">검사할 마법 데이터.</param>

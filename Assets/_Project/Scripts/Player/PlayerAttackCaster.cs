@@ -34,6 +34,10 @@ namespace WizardBrawl.Player
         [Tooltip("BY 조합 성공 시 사용할 마법 데이터.")]
         [SerializeField] private MagicData _byMagic;
 
+        [Header("궁 폴백")]
+        [Tooltip("강화 궁 사용 불가 시 폴백할 기본 궁 마법 데이터.")]
+        [SerializeField] private MagicData _baseUltimateMagic;
+
         [Header("메인 카메라")]
         [Tooltip("마법을 시전할 방향을 정할 메인카메라")]
         [SerializeField] private Camera _mainCamera;
@@ -50,6 +54,14 @@ namespace WizardBrawl.Player
         private bool _isTargeting;
         private MagicData _pendingMagic;
         private ElementCombinationType _pendingCombination = ElementCombinationType.None;
+        private ChainState _chainState = ChainState.None;
+
+        private enum ChainState
+        {
+            None,
+            DebuffReady,
+            CrowdControlReady
+        }
 
         protected override void Awake()
         {
@@ -179,7 +191,84 @@ namespace WizardBrawl.Player
         private bool TryCastSelectedMagic(MagicData selectedMagic, ElementCombinationType combo, Vector3 targetPoint)
         {
             Vector3 fireDirection = BuildFireDirection(targetPoint);
-            return TryUseSkill(selectedMagic, fireDirection);
+            if (IsUltimateCombination(combo))
+            {
+                return TryCastUltimate(selectedMagic, fireDirection);
+            }
+
+            bool castSuccess = TryUseSkill(selectedMagic, fireDirection);
+            if (castSuccess)
+            {
+                UpdatePatternStateOnCast(selectedMagic);
+            }
+
+            return castSuccess;
+        }
+
+        private bool TryCastUltimate(MagicData enhancedUltimate, Vector3 fireDirection)
+        {
+            bool hasEnhancedState = _chainState == ChainState.CrowdControlReady;
+            if (hasEnhancedState && enhancedUltimate != null && CanUseSkillNow(enhancedUltimate))
+            {
+                if (TryUseSkill(enhancedUltimate, fireDirection))
+                {
+                    Debug.Log("[ElementCombo] pattern=CC->Ultimate stage=Success");
+                    Debug.Log("[CastResult] CC->Ultimate enhanced cast");
+                    _chainState = ChainState.None;
+                    return true;
+                }
+            }
+
+            MagicData fallbackUltimate = _baseUltimateMagic != null ? _baseUltimateMagic : _primaryAttackMagic;
+            if (fallbackUltimate == null)
+            {
+                Debug.LogWarning("[CastResult] ultimate fallback failed: no base ultimate assigned");
+                _chainState = ChainState.None;
+                return false;
+            }
+
+            string fallbackReason = hasEnhancedState ? "enhanced_unavailable_resource" : "enhanced_unavailable_state";
+            if (!CanUseSkillNow(fallbackUltimate))
+            {
+                Debug.Log($"[CastResult] ultimate fallback blocked: reason={fallbackReason}");
+                _chainState = ChainState.None;
+                return false;
+            }
+
+            bool fallbackSuccess = TryUseSkill(fallbackUltimate, fireDirection);
+            if (fallbackSuccess)
+            {
+                Debug.Log("[ElementCombo] pattern=CC->Ultimate stage=Fallback");
+                Debug.Log($"[CastResult] ultimate fallback to base: reason={fallbackReason}");
+            }
+
+            _chainState = ChainState.None;
+            return fallbackSuccess;
+        }
+
+        private void UpdatePatternStateOnCast(MagicData castedMagic)
+        {
+            if (castedMagic is DebuffMagicData)
+            {
+                _chainState = ChainState.DebuffReady;
+                Debug.Log("[ElementCombo] pattern=Debuff->CC stage=DebuffArmed");
+                return;
+            }
+
+            if (castedMagic is CrowdControlMagicData)
+            {
+                if (_chainState == ChainState.DebuffReady)
+                {
+                    Debug.Log("[ElementCombo] pattern=Debuff->CC stage=Success");
+                }
+                else
+                {
+                    Debug.Log("[ElementCombo] pattern=Debuff->CC stage=Miss");
+                }
+
+                _chainState = ChainState.CrowdControlReady;
+                Debug.Log("[ElementCombo] pattern=CC->Ultimate stage=CcArmed");
+            }
         }
 
         private bool TryGetTargetPoint(out Vector3 targetPoint)
