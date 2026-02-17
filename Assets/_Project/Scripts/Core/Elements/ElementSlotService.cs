@@ -53,5 +53,31 @@ namespace WizardBrawl.Core
             _slotB = ElementType.None;
             return new ElementSlotUpdateResult(before, CurrentState, reason);
         }
+
+        /// <summary>
+        /// 슬롯의 앞 요소를 소비하고 나머지를 앞으로 당김.
+        /// </summary>
+        /// <param name="consumed">소비된 속성.</param>
+        /// <param name="result">갱신 결과.</param>
+        /// <param name="reason">로그 사유.</param>
+        /// <returns>소비 성공 시 true.</returns>
+        public bool TryConsumeFront(out ElementType consumed, out ElementSlotUpdateResult result, string reason)
+        {
+            ElementSlotState before = CurrentState;
+            consumed = ElementType.None;
+
+            if (_slotA == ElementType.None)
+            {
+                result = new ElementSlotUpdateResult(before, before, reason);
+                return false;
+            }
+
+            consumed = _slotA;
+            _slotA = _slotB;
+            _slotB = ElementType.None;
+
+            result = new ElementSlotUpdateResult(before, CurrentState, reason);
+            return true;
+        }
     }
 }
