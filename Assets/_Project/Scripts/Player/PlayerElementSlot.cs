@@ -32,6 +32,19 @@ namespace WizardBrawl.Player
             LogUpdate(result);
         }
 
+        /// <summary>
+        /// 슬롯의 앞 요소를 소비함(FIFO).
+        /// </summary>
+        /// <param name="consumed">소비된 속성.</param>
+        /// <param name="reason">소비 사유.</param>
+        /// <returns>소비 성공 시 true.</returns>
+        public bool TryConsumeFront(out ElementType consumed, string reason)
+        {
+            bool success = _slotService.TryConsumeFront(out consumed, out ElementSlotUpdateResult result, reason);
+            LogUpdate(result);
+            return success;
+        }
+
         private static void LogUpdate(ElementSlotUpdateResult result)
         {
             Debug.Log($"[ElementSlot] {result.Before} -> {result.After} | {result.Reason}");

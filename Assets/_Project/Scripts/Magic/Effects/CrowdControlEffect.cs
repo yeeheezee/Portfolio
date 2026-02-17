@@ -29,9 +29,9 @@ namespace WizardBrawl.Magic.Effects
                     continue;
                 }
 
-                if (target.TryGetComponent<ICrowdControlReceiver>(out ICrowdControlReceiver receiver))
+                if (target.TryGetComponent<IStatusReceiver>(out IStatusReceiver receiver))
                 {
-                    receiver.ApplyCrowdControl(_data.ControlType, _data.Duration, _data.Strength);
+                    receiver.ApplyStatus(StatusEvent.CreateCrowdControl(_data.ControlType, _data.Duration, _data.Strength, caster));
                     appliedCount++;
                 }
             }

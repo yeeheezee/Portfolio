@@ -75,9 +75,9 @@ namespace WizardBrawl.Magic
 
             int targetLayerMask = 1 << other.gameObject.layer;
             bool isTargetLayer = (_data.TargetLayers.value & targetLayerMask) != 0;
-            if (isTargetLayer && other.TryGetComponent<IDebuffReceiver>(out IDebuffReceiver debuffReceiver))
+            if (isTargetLayer && other.TryGetComponent<IStatusReceiver>(out IStatusReceiver statusReceiver))
             {
-                debuffReceiver.ApplyDebuff(_data.DebuffType, _data.Duration, _data.Magnitude);
+                statusReceiver.ApplyStatus(StatusEvent.CreateDebuff(_data.DebuffType, _data.Duration, _data.Magnitude, _owner));
                 Debug.Log($"[DebuffMissile] direct_hit target={other.name} type={_data.DebuffType}");
             }
 
@@ -99,14 +99,14 @@ namespace WizardBrawl.Magic
             for (int i = 0; i < hits.Length; i++)
             {
                 GameObject target = hits[i].gameObject;
-                if (target == _owner)
+                if (_owner != null && target.transform.root == _owner.transform.root)
                 {
                     continue;
                 }
 
-                if (target.TryGetComponent<ICrowdControlReceiver>(out ICrowdControlReceiver ccReceiver))
+                if (target.TryGetComponent<IStatusReceiver>(out IStatusReceiver statusReceiver))
                 {
-                    ccReceiver.ApplyCrowdControl(CrowdControlType.Slow, _data.BurstSlowDuration, _data.BurstSlowStrength);
+                    statusReceiver.ApplyStatus(StatusEvent.CreateCrowdControl(CrowdControlType.Slow, _data.BurstSlowDuration, _data.BurstSlowStrength, _owner));
                     appliedCount++;
                 }
             }
