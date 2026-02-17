@@ -234,7 +234,7 @@ namespace WizardBrawl.Player
                 _chainState = ChainState.None;
                 return false;
             }
-
+            
             bool fallbackSuccess = TryUseSkill(fallbackUltimate, fireDirection);
             if (fallbackSuccess)
             {

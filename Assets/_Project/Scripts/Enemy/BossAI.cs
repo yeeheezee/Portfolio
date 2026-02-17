@@ -1,13 +1,14 @@
 using UnityEngine;
 using System.Collections;
 using WizardBrawl.Core;
+using WizardBrawl.Enemy.Status;
 
 namespace WizardBrawl.Enemy
 {
     /// <summary>
     /// FSM 기반의 보스 AI. 행동을 결정하는 역할을 함.
     /// </summary>
-    public class BossAI : MonoBehaviour, ICrowdControlReceiver, IDebuffReceiver
+    public class BossAI : MonoBehaviour, IStatusReceiver
     {
         [Header("보스 스탯 데이터")]
         [Tooltip("보스의 모든 행동 수치를 정의.")]
@@ -18,23 +19,21 @@ namespace WizardBrawl.Enemy
 
         private Transform _playerTransform;
         private BossAttackCaster _attackCaster;
+        private Health _health;
+        private CombatStatusController _statusController;
         private Coroutine _attackCoroutine;
         private int _standardAttackCount = 0;
-        private float _stunUntilTime;
-        private float _rootUntilTime;
-        private float _slowUntilTime;
-        private float _slowMoveMultiplier = 1f;
-        private float _weakenUntilTime;
-        private float _attackDelayMultiplier = 1f;
 
         /// <summary>
         /// 디버프 적용으로 증가한 피격 계수(추후 데미지 파이프라인 연동용).
         /// </summary>
-        public float IncomingDamageMultiplier { get; private set; } = 1f;
+        public float IncomingDamageMultiplier => _statusController == null ? 1f : _statusController.IncomingDamageMultiplier;
 
         private void Awake()
         {
             _attackCaster = GetComponent<BossAttackCaster>();
+            _health = GetComponent<Health>();
+            _statusController = new CombatStatusController(_health);
         }
 
         private void Start()
@@ -44,7 +43,7 @@ namespace WizardBrawl.Enemy
 
         private void Update()
         {
-            UpdateStatusTimers();
+            _statusController.Tick(Time.time);
 
             if (IsStunned())
             {
@@ -74,44 +73,22 @@ namespace WizardBrawl.Enemy
 
         public void ApplyCrowdControl(CrowdControlType controlType, float duration, float strength)
         {
-            float clampedDuration = Mathf.Max(0f, duration);
-            float clampedStrength = Mathf.Clamp01(strength);
-
-            switch (controlType)
-            {
-                case CrowdControlType.Stun:
-                    _stunUntilTime = Mathf.Max(_stunUntilTime, Time.time + clampedDuration);
-                    break;
-                case CrowdControlType.Root:
-                    _rootUntilTime = Mathf.Max(_rootUntilTime, Time.time + clampedDuration);
-                    break;
-                case CrowdControlType.Slow:
-                    _slowUntilTime = Mathf.Max(_slowUntilTime, Time.time + clampedDuration);
-                    _slowMoveMultiplier = Mathf.Min(_slowMoveMultiplier, Mathf.Clamp(1f - clampedStrength, 0.1f, 1f));
-                    break;
-            }
-
-            Debug.Log($"[StateTransition] CC applied: {controlType} | duration={clampedDuration:F2}, strength={clampedStrength:F2}");
+            ApplyStatus(StatusEvent.CreateCrowdControl(controlType, duration, strength, gameObject));
         }
 
         public void ApplyDebuff(DebuffType debuffType, float duration, float magnitude)
         {
-            float clampedDuration = Mathf.Max(0f, duration);
-            float clampedMagnitude = Mathf.Max(0f, magnitude);
+            ApplyStatus(StatusEvent.CreateDebuff(debuffType, duration, magnitude, gameObject));
+        }
 
-            switch (debuffType)
-            {
-                case DebuffType.DefenseDown:
-                case DebuffType.Vulnerability:
-                    IncomingDamageMultiplier = Mathf.Max(IncomingDamageMultiplier, 1f + clampedMagnitude);
-                    break;
-                case DebuffType.Weaken:
-                    _weakenUntilTime = Mathf.Max(_weakenUntilTime, Time.time + clampedDuration);
-                    _attackDelayMultiplier = Mathf.Max(_attackDelayMultiplier, 1f + clampedMagnitude);
-                    break;
-            }
+        public void ApplyStatus(StatusEvent statusEvent)
+        {
+            _statusController.Apply(statusEvent);
+        }
 
-            Debug.Log($"[StateTransition] Debuff applied: {debuffType} | duration={clampedDuration:F2}, magnitude={clampedMagnitude:F2}");
+        public bool IsUltimateChainReady()
+        {
+            return _statusController.IsUltimateChainReady(Time.time);
         }
 
         /// <summary>
@@ -177,13 +154,13 @@ namespace WizardBrawl.Enemy
         /// </summary>
         private void MaintainOptimalDistance()
         {
-            if (IsRooted())
+            float moveSpeed = GetCurrentMoveSpeed();
+            if (moveSpeed <= 0f)
             {
                 return;
             }
 
             float distance = Vector3.Distance(transform.position, _playerTransform.position);
-            float moveSpeed = GetCurrentMoveSpeed();
 
             if (distance > _stats.OptimalDistance + _stats.DistanceTolerance)
             {
@@ -234,53 +211,35 @@ namespace WizardBrawl.Enemy
                 {
                     _attackCaster.PerformUnparryableAttack();
                     _standardAttackCount = 0;
-                    yield return new WaitForSeconds(_stats.UnparryableAttackCooldown * _attackDelayMultiplier);
+                    yield return new WaitForSeconds(_stats.UnparryableAttackCooldown * _statusController.AttackDelayMultiplier);
                 }
                 else if (_attackCaster.IsHeavyAttackReady)
                 {
                     _attackCaster.PerformHeavyAttack();
-                    yield return new WaitForSeconds(_stats.HeavyAttackCooldown * _attackDelayMultiplier);
+                    yield return new WaitForSeconds(_stats.HeavyAttackCooldown * _statusController.AttackDelayMultiplier);
                 }
                 else if (_attackCaster.IsStandardAttackReady)
                 {
                     _attackCaster.PerformStandardAttack();
                     _standardAttackCount++;
-                    yield return new WaitForSeconds(_stats.StandardAttackCooldown * _attackDelayMultiplier);
+                    yield return new WaitForSeconds(_stats.StandardAttackCooldown * _statusController.AttackDelayMultiplier);
                 }
                 else
                 {
                     yield return null;
                 }
-                yield return new WaitForSeconds(_stats.RestBetweenAttacks * _attackDelayMultiplier);
-            }
-        }
-
-        private void UpdateStatusTimers()
-        {
-            if (Time.time >= _slowUntilTime)
-            {
-                _slowMoveMultiplier = 1f;
-            }
-
-            if (Time.time >= _weakenUntilTime)
-            {
-                _attackDelayMultiplier = 1f;
+                yield return new WaitForSeconds(_stats.RestBetweenAttacks * _statusController.AttackDelayMultiplier);
             }
         }
 
         private bool IsStunned()
         {
-            return Time.time < _stunUntilTime;
-        }
-
-        private bool IsRooted()
-        {
-            return Time.time < _rootUntilTime;
+            return _statusController.IsStunned(Time.time);
         }
 
         private float GetCurrentMoveSpeed()
         {
-            return _stats.MoveSpeed * _slowMoveMultiplier;
+            return _stats.MoveSpeed * _statusController.GetMoveMultiplier(Time.time);
         }
 
         private void StopAttackCoroutineIfRunning()
@@ -293,5 +252,6 @@ namespace WizardBrawl.Enemy
             StopCoroutine(_attackCoroutine);
             _attackCoroutine = null;
         }
+
     }
 }
