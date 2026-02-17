@@ -23,10 +23,14 @@ namespace WizardBrawl.Magic.Data
         [Tooltip("투사체의 최대 생존 시간.")]
         [SerializeField] private float _lifetime = 3f;
 
+        [Tooltip("궁극기 체인 판정용 투사체 여부.")]
+        [SerializeField] private bool _isUltimateHit;
+
         public GameObject ProjectilePrefab => _projectilePrefab;
         public int Damage => _damage;
         public float Speed => _speed;
         public float Lifetime => _lifetime;
+        public bool IsUltimateHit => _isUltimateHit;
 
         /// <summary>
         /// 이 데이터에 맞는 ProjectileEffect 실행 로직을 생성하여 반환함.
