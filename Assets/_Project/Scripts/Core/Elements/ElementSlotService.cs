@@ -8,6 +8,9 @@ namespace WizardBrawl.Core
         private ElementType _slotA = ElementType.None;
         private ElementType _slotB = ElementType.None;
 
+        /// <summary>
+        /// 현재 슬롯 상태 스냅샷을 반환함.
+        /// </summary>
         public ElementSlotState CurrentState => new ElementSlotState(_slotA, _slotB);
 
         /// <summary>

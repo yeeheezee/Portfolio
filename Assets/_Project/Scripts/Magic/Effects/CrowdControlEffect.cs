@@ -11,11 +11,17 @@ namespace WizardBrawl.Magic.Effects
     {
         private readonly CrowdControlMagicData _data;
 
+        /// <summary>
+        /// CC 실행에 사용할 데이터를 주입함.
+        /// </summary>
         public CrowdControlEffect(CrowdControlMagicData data)
         {
             _data = data;
         }
 
+        /// <summary>
+        /// 지정 범위의 대상에게 CC 상태 이벤트를 적용함.
+        /// </summary>
         public void Execute(GameObject caster, Transform spawnPoint, Vector3 fireDirection)
         {
             Collider[] hits = Physics.OverlapSphere(spawnPoint.position, _data.Radius, _data.TargetLayers);

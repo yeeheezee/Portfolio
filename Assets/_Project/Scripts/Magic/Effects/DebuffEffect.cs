@@ -12,11 +12,17 @@ namespace WizardBrawl.Magic.Effects
     {
         private readonly DebuffMagicData _data;
 
+        /// <summary>
+        /// 디버프 실행에 사용할 데이터를 주입함.
+        /// </summary>
         public DebuffEffect(DebuffMagicData data)
         {
             _data = data;
         }
 
+        /// <summary>
+        /// 디버프 투사체를 생성하고 초기화 후 발사함.
+        /// </summary>
         public void Execute(GameObject caster, Transform spawnPoint, Vector3 fireDirection)
         {
             if (_data.ProjectilePrefab == null)

@@ -11,6 +11,9 @@ namespace WizardBrawl.Magic.Effects
     {
         private readonly ProjectileMagicData _data;
 
+        /// <summary>
+        /// 투사체 실행에 사용할 데이터를 주입함.
+        /// </summary>
         public ProjectileEffect(ProjectileMagicData data)
         {
             _data = data;

@@ -39,16 +39,25 @@ namespace WizardBrawl.Core
             Timestamp = timestamp;
         }
 
+        /// <summary>
+        /// 디버프 이벤트를 현재 시각 기준으로 생성함.
+        /// </summary>
         public static StatusEvent CreateDebuff(DebuffType debuffType, float duration, float magnitude, GameObject source)
         {
             return new StatusEvent(StatusEventKind.Debuff, debuffType, null, duration, magnitude, 0f, false, source, Time.time);
         }
 
+        /// <summary>
+        /// 군중제어 이벤트를 현재 시각 기준으로 생성함.
+        /// </summary>
         public static StatusEvent CreateCrowdControl(CrowdControlType crowdControlType, float duration, float magnitude, GameObject source)
         {
             return new StatusEvent(StatusEventKind.CrowdControl, null, crowdControlType, duration, magnitude, 0f, false, source, Time.time);
         }
 
+        /// <summary>
+        /// 피해 이벤트를 현재 시각 기준으로 생성함.
+        /// </summary>
         public static StatusEvent CreateDamage(float damage, bool isUltimate, GameObject source)
         {
             return new StatusEvent(StatusEventKind.Damage, null, null, 0f, 0f, damage, isUltimate, source, Time.time);

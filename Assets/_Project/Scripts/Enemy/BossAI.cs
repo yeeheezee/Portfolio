@@ -71,21 +71,33 @@ namespace WizardBrawl.Enemy
             return _playerTransform != null && _currentState != State.Idle && _stats != null;
         }
 
+        /// <summary>
+        /// CC 이벤트를 생성해 상태 수신 진입점으로 전달함.
+        /// </summary>
         public void ApplyCrowdControl(CrowdControlType controlType, float duration, float strength)
         {
             ApplyStatus(StatusEvent.CreateCrowdControl(controlType, duration, strength, gameObject));
         }
 
+        /// <summary>
+        /// 디버프 이벤트를 생성해 상태 수신 진입점으로 전달함.
+        /// </summary>
         public void ApplyDebuff(DebuffType debuffType, float duration, float magnitude)
         {
             ApplyStatus(StatusEvent.CreateDebuff(debuffType, duration, magnitude, gameObject));
         }
 
+        /// <summary>
+        /// 상태 이벤트를 상태 컨트롤러에 위임해 적용함.
+        /// </summary>
         public void ApplyStatus(StatusEvent statusEvent)
         {
             _statusController.Apply(statusEvent);
         }
 
+        /// <summary>
+        /// 현재 시각 기준 궁 체인 가능 여부를 반환함.
+        /// </summary>
         public bool IsUltimateChainReady()
         {
             return _statusController.IsUltimateChainReady(Time.time);

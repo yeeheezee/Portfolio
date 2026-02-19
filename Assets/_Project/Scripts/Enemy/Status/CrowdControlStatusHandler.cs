@@ -15,10 +15,24 @@ namespace WizardBrawl.Enemy.Status
         private float _crowdControlWindowUntilTime;
         private float _slowMoveMultiplier = 1f;
 
+        /// <summary>
+        /// 현재 시각 기준 스턴 상태 여부를 반환함.
+        /// </summary>
         public bool IsStunned(float now) => now < _stunUntilTime;
+
+        /// <summary>
+        /// 현재 시각 기준 약경직 상태 여부를 반환함.
+        /// </summary>
         public bool IsWeakStaggered(float now) => now < _weakStaggerUntilTime;
+
+        /// <summary>
+        /// 현재 시각 기준 CC 체인 시간창 활성 여부를 반환함.
+        /// </summary>
         public bool IsCrowdControlWindowActive(float now) => now < _crowdControlWindowUntilTime;
 
+        /// <summary>
+        /// 현재 시각 기준 이동 배율을 계산해 반환함.
+        /// </summary>
         public float GetMoveMultiplier(float now)
         {
             if (IsStunned(now) || IsWeakStaggered(now))
@@ -29,11 +43,17 @@ namespace WizardBrawl.Enemy.Status
             return now < _slowUntilTime ? _slowMoveMultiplier : 1f;
         }
 
+        /// <summary>
+        /// 궁 체인 성공 후 CC 시간창을 즉시 소모함.
+        /// </summary>
         public void ConsumeCrowdControlWindow()
         {
             _crowdControlWindowUntilTime = 0f;
         }
 
+        /// <summary>
+        /// CC 이벤트를 우선순위 규칙으로 판정해 상태를 적용함.
+        /// </summary>
         public string Apply(StatusEvent statusEvent, bool hasDebuffWindow)
         {
             if (!statusEvent.CrowdControlType.HasValue)
@@ -70,6 +90,9 @@ namespace WizardBrawl.Enemy.Status
             return $"enter type=WeakStagger reason=no_debuff_window duration={duration:F2}";
         }
 
+        /// <summary>
+        /// CC 관련 상태 만료를 처리하고 만료 전이 로그를 기록함.
+        /// </summary>
         public void Tick(float now, Action<string> emitTransition)
         {
             if (emitTransition == null)
