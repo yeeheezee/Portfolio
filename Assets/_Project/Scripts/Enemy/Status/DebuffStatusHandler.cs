@@ -15,14 +15,27 @@ namespace WizardBrawl.Enemy.Status
         private float _incomingDamageMultiplier = 1f;
         private float _attackDelayMultiplier = 1f;
 
+        /// <summary>
+        /// 현재 디버프 기준 피격 배율을 반환함.
+        /// </summary>
         public float IncomingDamageMultiplier => _incomingDamageMultiplier;
+
+        /// <summary>
+        /// 현재 디버프 기준 공격 지연 배율을 반환함.
+        /// </summary>
         public float AttackDelayMultiplier => _attackDelayMultiplier;
 
+        /// <summary>
+        /// 현재 시각 기준 디버프 체인 시간창 활성 여부를 반환함.
+        /// </summary>
         public bool IsDebuffWindowActive(float now)
         {
             return now < _debuffWindowUntilTime;
         }
 
+        /// <summary>
+        /// 디버프 이벤트를 적용하고 체인 시간창 및 배율 상태를 갱신함.
+        /// </summary>
         public string Apply(StatusEvent statusEvent)
         {
             if (!statusEvent.DebuffType.HasValue)
@@ -53,6 +66,9 @@ namespace WizardBrawl.Enemy.Status
             return $"enter type=Debuff:{debuffType} duration={duration:F2} magnitude={magnitude:F2}";
         }
 
+        /// <summary>
+        /// 디버프 시간창/배율 만료를 처리하고 만료 전이 로그를 기록함.
+        /// </summary>
         public void Tick(float now, Action<string> emitTransition)
         {
             if (emitTransition == null)

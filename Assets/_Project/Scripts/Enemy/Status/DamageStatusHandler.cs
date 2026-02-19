@@ -10,6 +10,9 @@ namespace WizardBrawl.Enemy.Status
     {
         private const float UltimateChainBonus = 1.5f;
 
+        /// <summary>
+        /// 피해 이벤트를 적용하고 궁 체인 증폭 및 시간창 소비 여부를 반환함.
+        /// </summary>
         public bool Apply(
             StatusEvent statusEvent,
             Health health,

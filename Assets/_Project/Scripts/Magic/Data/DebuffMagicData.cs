@@ -53,6 +53,9 @@ namespace WizardBrawl.Magic.Data
         public float BurstSlowDuration => _burstSlowDuration;
         public float BurstSlowStrength => _burstSlowStrength;
 
+        /// <summary>
+        /// 데이터에 대응하는 디버프 실행 효과를 생성함.
+        /// </summary>
         public override IMagicEffect CreateEffect()
         {
             return new DebuffEffect(this);

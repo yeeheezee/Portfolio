@@ -23,6 +23,9 @@ namespace WizardBrawl.Magic
             _rigidbody = GetComponent<Rigidbody>();
         }
 
+        /// <summary>
+        /// 발사 전 디버프 투사체 설정값을 초기화함.
+        /// </summary>
         public void Initialize(DebuffMagicData data, GameObject owner)
         {
             _data = data;
@@ -32,6 +35,9 @@ namespace WizardBrawl.Magic
             _parryElement = _data.ParryElement;
         }
 
+        /// <summary>
+        /// 지정 방향으로 디버프 투사체를 발사함.
+        /// </summary>
         public void Launch(Vector3 direction)
         {
             _rigidbody.linearVelocity = direction.normalized * _data.ProjectileSpeed;

@@ -32,6 +32,9 @@ namespace WizardBrawl.Magic.Data
         public float Radius => _radius;
         public LayerMask TargetLayers => _targetLayers;
 
+        /// <summary>
+        /// 데이터에 대응하는 CC 실행 효과를 생성함.
+        /// </summary>
         public override IMagicEffect CreateEffect()
         {
             return new CrowdControlEffect(this);

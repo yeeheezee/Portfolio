@@ -5,6 +5,9 @@ namespace WizardBrawl.Core
     /// </summary>
     public readonly struct ElementSlotUpdateResult
     {
+        /// <summary>
+        /// 슬롯 갱신 결과 값을 생성함.
+        /// </summary>
         public ElementSlotUpdateResult(ElementSlotState before, ElementSlotState after, string reason)
         {
             Before = before;
