@@ -53,7 +53,12 @@ namespace WizardBrawl.Magic
                 return false;
             }
 
-            if (!CanUseSkill(skill)) return false;
+            if (!CanUseSkill(skill))
+            {
+                string failReason = ResolveSkillBlockReason(skill);
+                Debug.Log($"[CastResult] use blocked: skill={skill.MagicName}, reason={failReason}");
+                return false;
+            }
 
             _mana.UseMana(skill.ManaCost);
             skill.CreateEffect().Execute(gameObject, _magicSpawnPoint, fireDirection);
@@ -92,6 +97,26 @@ namespace WizardBrawl.Magic
             if (!IsSkillReady(skill)) return false;
             if (!_mana.IsManaAvailable(skill.ManaCost)) return false;
             return true;
+        }
+
+        private string ResolveSkillBlockReason(MagicData skill)
+        {
+            if (skill == null)
+            {
+                return "null_skill";
+            }
+
+            if (!IsSkillReady(skill))
+            {
+                return "cooldown";
+            }
+
+            if (!_mana.IsManaAvailable(skill.ManaCost))
+            {
+                return "insufficient_mana";
+            }
+
+            return "unknown";
         }
     }
 }
