@@ -817,7 +817,9 @@ PlayerSettings:
   webGLCloseOnQuit: 0
   webWasm2023: 0
   webEnableSubmoduleStrippingCompatibility: 0
-  scriptingDefineSymbols: {}
+  scriptingDefineSymbols:
+    Editor: CINEMACHINE_PHYSICS
+    Standalone: CINEMACHINE_PHYSICS
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:
