@@ -34,6 +34,33 @@
                     "initialStateCheck": true
                 },
                 {
+                    "name": "CastQ",
+                    "type": "Button",
+                    "id": "72fb9c6d-08f6-44e3-8e4f-a2ee1f26aa01",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "CastE",
+                    "type": "Button",
+                    "id": "9c3a0f6e-1b9e-4f36-a2d5-16969d07c8d2",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "CastR",
+                    "type": "Button",
+                    "id": "f2d2a390-5fbe-45a0-a4cb-c876213ad41e",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "Jump",
                     "type": "Button",
                     "id": "265497b4-c8a2-4479-ac94-ca6afa9613ec",
@@ -270,6 +297,39 @@
                     "processors": "",
                     "groups": "XR",
                     "action": "Fire",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8f3f17c2-9c5f-4f07-92f7-7f1dd8a0ba32",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "CastQ",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6d4d62a9-4f1e-4e70-8b3a-6b7996149138",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "CastE",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4f7ec0eb-7c8d-4c52-9f27-19e00db82d6e",
+                    "path": "<Keyboard>/r",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "CastR",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
