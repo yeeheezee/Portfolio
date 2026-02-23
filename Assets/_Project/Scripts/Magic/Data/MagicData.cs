@@ -32,12 +32,18 @@ namespace WizardBrawl.Magic.Data
         [Tooltip("패링 성공 시 플레이어가 획득하는 속성.")]
         [SerializeField] private ElementType _parryElement = ElementType.None;
 
-        [Header("기본 실행 분류")]
-        [Tooltip("기본 전달 방식. Auto면 캐스터의 폴백 규칙을 따름.")]
-        [SerializeField] private SpellDeliveryType _defaultDeliveryType = SpellDeliveryType.Auto;
+        [Tooltip("시전 방식(즉시/타게팅).")]
+        [SerializeField] private MagicCastMode _castMode = MagicCastMode.Instant;
 
-        [Tooltip("기본 명중 효과 분류. Auto면 캐스터의 폴백 규칙을 따름.")]
-        [SerializeField] private SpellImpactType _defaultImpactType = SpellImpactType.Auto;
+        [Tooltip("궁극기 체인/폴백 플로우를 사용할지 여부.")]
+        [SerializeField] private bool _useUltimateFlow;
+
+        [Header("캐스팅 타이밍")]
+        [Tooltip("시전 입력 후 실제 발동까지의 선딜(초). 0이면 즉시 발동.")]
+        [SerializeField] private float _castWindupTime = 0.1f;
+
+        [Tooltip("시전 발동 후 다음 입력 허용까지의 후딜(초). 0이면 즉시 복귀.")]
+        [SerializeField] private float _castRecoveryTime = 0.15f;
 
         public string MagicName => _magicName;
         public string Description => _description;
@@ -46,8 +52,10 @@ namespace WizardBrawl.Magic.Data
         public float Cooldown => _cooldown;
         public bool IsParryable => _isParryable;
         public ElementType ParryElement => _parryElement;
-        public SpellDeliveryType DefaultDeliveryType => _defaultDeliveryType;
-        public SpellImpactType DefaultImpactType => _defaultImpactType;
+        public MagicCastMode CastMode => _castMode;
+        public bool UseUltimateFlow => _useUltimateFlow;
+        public float CastWindupTime => _castWindupTime;
+        public float CastRecoveryTime => _castRecoveryTime;
 
         /// <summary>
         /// 이 데이터에 맞는 마법 실행 로직(IMagicEffect)을 생성하여 반환.

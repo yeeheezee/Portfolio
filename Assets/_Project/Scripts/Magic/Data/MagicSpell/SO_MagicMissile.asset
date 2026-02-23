@@ -12,12 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 436737408d9126f4b9f6dc21ea258c1d, type: 3}
   m_Name: SO_MagicMissile
   m_EditorClassIdentifier: 
-  _magicName: Magic Missile
+  _magicName: Starfall Proxy
   _description: 
   _icon: {fileID: 0}
-  _manaCost: 10
-  _cooldown: 1
+  _manaCost: 35
+  _cooldown: 12
+  _isParryable: 0
+  _parryElement: 0
+  _castMode: 1
+  _useUltimateFlow: 1
+  _castWindupTime: 0.3
+  _castRecoveryTime: 0.45
   _projectilePrefab: {fileID: 887699550506029655, guid: 055135e1c426a5b418c9b19a89cf6b64, type: 3}
-  _damage: 10
-  _speed: 10
-  _lifetime: 3
+  _damage: 45
+  _speed: 22
+  _lifetime: 4
+  _isUltimateHit: 1

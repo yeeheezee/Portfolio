@@ -12,17 +12,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca6031a5e35f50c4a9af9be6eb2525b5, type: 3}
   m_Name: SO_CrowdControl
   m_EditorClassIdentifier: 
-  _magicName: New Magic
+  _magicName: Gravity Lock
   _description: 
   _icon: {fileID: 0}
-  _manaCost: 10
-  _cooldown: 1
+  _manaCost: 20
+  _cooldown: 6
   _isParryable: 1
   _parryElement: 0
+  _castMode: 1
+  _useUltimateFlow: 0
+  _castWindupTime: 0.2
+  _castRecoveryTime: 0.32
   _controlType: 1
-  _duration: 1.5
+  _duration: 1.35
   _strength: 1
-  _radius: 2.5
+  _radius: 3.2
   _targetLayers:
     serializedVersion: 2
     m_Bits: 4294967295

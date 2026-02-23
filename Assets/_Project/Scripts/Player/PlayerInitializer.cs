@@ -15,20 +15,19 @@ namespace WizardBrawl.Player
     /// </summary>
     public class PlayerInitializer : MonoBehaviour
     {
+        [Header("커서 모드")]
+        [Tooltip("전투 기본 모드에서 커서를 잠그고 숨김.")]
+        [SerializeField] private bool _lockCursorInCombat = true;
+
+        [Tooltip("ALT를 누르고 있는 동안 커서를 표시하고 잠금을 해제함.")]
+        [SerializeField] private bool _holdAltToShowCursor = true;
+
         private PlayerInput _playerInput;
         private PlayerMovement _playerMovement;
         private PlayerJump _playerJump;
         private PlayerAttackCaster _playerAttackCaster;
         private MagicParry _manaParry;
-        private InputAction _moveAction;
-        private InputAction _fireAction;
-        private InputAction _jumpAction;
-        private InputAction _parryAction;
-        private InputAction _castDebuffAction;
-        private InputAction _castCrowdControlAction;
-        private InputAction _castUltimateAction;
-        private InputAction _sprintAction;
-        private InputAction _armInjectAction;
+        private bool _isCursorUiMode;
 
         /// <summary>
         /// 컴포넌트들을 캐싱하고 Input System의 액션과 각 컴포넌트의 메서드를 연결(바인딩)함.
@@ -49,188 +48,163 @@ namespace WizardBrawl.Player
             _castUltimateAction = FindAction("CastUltimate");
             _sprintAction = FindAction("Sprint");
             _armInjectAction = FindAction("ArmInject");
+            _playerInput.actions["Move"].performed += context => _playerMovement.SetMoveInput(context.ReadValue<Vector2>());
+            _playerInput.actions["Move"].canceled += context => _playerMovement.SetMoveInput(Vector2.zero);
+            _playerInput.actions["Jump"].performed += context => _playerJump.PerformJump();
+            _playerInput.actions["Fire"].performed += context => _playerAttackCaster.PerformTargetConfirm();
+            _playerInput.actions["Parry"].performed += OnParryPerformed;
+            RegisterOptionalCastAction("CastQ", OnCastQPerformed);
+            RegisterOptionalCastAction("CastE", OnCastEPerformed);
+            RegisterOptionalCastAction("CastR", OnCastRPerformed);
 
-            if (_manaParry == null)
-            {
-                Debug.LogError("PlayerInitializer에서 MagicParry를 찾을 수 없습니다.", this);
-            }
+            ApplyCombatCursorMode();
         }
 
-        private InputAction FindAction(string actionName)
+        private void Update()
         {
-            InputAction action = _playerInput.actions.FindAction(actionName, throwIfNotFound: false);
-            if (action == null)
+            if (!_holdAltToShowCursor)
             {
-                Debug.LogWarning($"PlayerInitializer 입력 액션 누락: {actionName}", this);
+                return;
             }
-
-            return action;
+            SyncCursorModeFromCurrentInput();
         }
 
         private void OnEnable()
         {
-            if (_moveAction != null)
-            {
-                _moveAction.performed += OnMovePerformed;
-                _moveAction.canceled += OnMoveCanceled;
-            }
-
-            if (_fireAction != null)
-            {
-                _fireAction.performed += OnFirePerformed;
-            }
-
-            if (_jumpAction != null)
-            {
-                _jumpAction.performed += OnJumpPerformed;
-            }
-
-            if (_parryAction != null)
-            {
-                _parryAction.performed += OnParryPerformed;
-            }
-
-            if (_castDebuffAction != null)
-            {
-                _castDebuffAction.performed += OnCastDebuffPerformed;
-            }
-
-            if (_castCrowdControlAction != null)
-            {
-                _castCrowdControlAction.performed += OnCastCrowdControlPerformed;
-            }
-
-            if (_castUltimateAction != null)
-            {
-                _castUltimateAction.performed += OnCastUltimatePerformed;
-            }
-
-            if (_sprintAction != null)
-            {
-                _sprintAction.performed += OnSprintPerformed;
-                _sprintAction.canceled += OnSprintCanceled;
-            }
-
-            if (_armInjectAction != null)
-            {
-                _armInjectAction.performed += OnArmInjectPerformed;
-            }
+            // 재활성화 시 ALT 입력 상태를 기준으로 커서 모드를 복구함.
+            SyncCursorModeFromCurrentInput();
         }
 
         private void OnDisable()
         {
-            if (_moveAction != null)
-            {
-                _moveAction.performed -= OnMovePerformed;
-                _moveAction.canceled -= OnMoveCanceled;
-            }
-
-            if (_fireAction != null)
-            {
-                _fireAction.performed -= OnFirePerformed;
-            }
-
-            if (_jumpAction != null)
-            {
-                _jumpAction.performed -= OnJumpPerformed;
-            }
-
-            if (_parryAction != null)
-            {
-                _parryAction.performed -= OnParryPerformed;
-            }
-
-            if (_castDebuffAction != null)
-            {
-                _castDebuffAction.performed -= OnCastDebuffPerformed;
-            }
-
-            if (_castCrowdControlAction != null)
-            {
-                _castCrowdControlAction.performed -= OnCastCrowdControlPerformed;
-            }
-
-            if (_castUltimateAction != null)
-            {
-                _castUltimateAction.performed -= OnCastUltimatePerformed;
-            }
-
-            if (_sprintAction != null)
-            {
-                _sprintAction.performed -= OnSprintPerformed;
-                _sprintAction.canceled -= OnSprintCanceled;
-            }
-
-            if (_armInjectAction != null)
-            {
-                _armInjectAction.performed -= OnArmInjectPerformed;
-            }
-        }
-
-        private void OnMovePerformed(InputAction.CallbackContext context)
-        {
-            _playerMovement.SetMoveInput(context.ReadValue<Vector2>());
-        }
-
-        private void OnMoveCanceled(InputAction.CallbackContext context)
-        {
-            _playerMovement.SetMoveInput(Vector2.zero);
-        }
-
-        private void OnJumpPerformed(InputAction.CallbackContext context)
-        {
-            _playerJump.PerformJump();
-        }
-
-        private void OnFirePerformed(InputAction.CallbackContext context)
-        {
-            _playerAttackCaster.PerformAttack();
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+            _isCursorUiMode = true;
         }
 
         private void OnParryPerformed(InputAction.CallbackContext context)
         {
-            if (_manaParry == null)
-            {
-                return;
-            }
-
             if (_playerAttackCaster != null && _playerAttackCaster.IsTargeting)
             {
-                Debug.Log("[Parry] blocked: targeting_in_progress");
+                Debug.Log("[Input] blocked: action=Parry reason=targeting");
                 return;
             }
 
-            _manaParry.AttemptParry();
+            if (_playerAttackCaster != null && _playerAttackCaster.IsCastingLocked)
+            {
+                Debug.Log("[Input] blocked: action=Parry reason=cast_locked");
+                return;
+            }
+
+            _manaParry?.AttemptParry();
         }
 
-        private void OnCastDebuffPerformed(InputAction.CallbackContext context)
+        private void OnCastQPerformed(InputAction.CallbackContext context)
         {
-            _playerAttackCaster.PerformDebuffCast();
+            if (IsTargetingBlockedAction("Q"))
+            {
+                return;
+            }
+
+            _playerAttackCaster?.PerformCastQ();
         }
 
-        private void OnCastCrowdControlPerformed(InputAction.CallbackContext context)
+        private void OnCastEPerformed(InputAction.CallbackContext context)
         {
-            _playerAttackCaster.PerformCrowdControlCast();
+            if (IsTargetingBlockedAction("E"))
+            {
+                return;
+            }
+
+            _playerAttackCaster?.PerformCastE();
         }
 
-        private void OnCastUltimatePerformed(InputAction.CallbackContext context)
+        private void OnCastRPerformed(InputAction.CallbackContext context)
         {
-            _playerAttackCaster.PerformUltimateCast();
+            if (IsTargetingBlockedAction("R"))
+            {
+                return;
+            }
+
+            _playerAttackCaster?.PerformCastR();
         }
 
-        private void OnSprintPerformed(InputAction.CallbackContext context)
+        private void ApplyCombatCursorMode()
         {
-            _playerMovement.SetSprintPressed(true);
+            if (_lockCursorInCombat)
+            {
+                Cursor.visible = false;
+                Cursor.lockState = CursorLockMode.Locked;
+            }
+            else
+            {
+                Cursor.visible = true;
+                Cursor.lockState = CursorLockMode.None;
+            }
+
+            _isCursorUiMode = false;
         }
 
-        private void OnSprintCanceled(InputAction.CallbackContext context)
+        private static void ApplyUiCursorMode()
         {
-            _playerMovement.SetSprintPressed(false);
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
         }
 
-        private void OnArmInjectPerformed(InputAction.CallbackContext context)
+        private void SyncCursorModeFromCurrentInput()
         {
-            _playerAttackCaster.ToggleInjectArm();
+            if (!_holdAltToShowCursor)
+            {
+                ApplyCombatCursorMode();
+                return;
+            }
+
+            bool isAltPressed = Keyboard.current != null
+                && (Keyboard.current.leftAltKey.isPressed || Keyboard.current.rightAltKey.isPressed);
+
+            if (isAltPressed == _isCursorUiMode)
+            {
+                return;
+            }
+
+            if (isAltPressed)
+            {
+                ApplyUiCursorMode();
+                _isCursorUiMode = true;
+            }
+            else
+            {
+                ApplyCombatCursorMode();
+            }
+        }
+
+        private void RegisterOptionalCastAction(string actionName, System.Action<InputAction.CallbackContext> callback)
+        {
+            InputAction action = _playerInput.actions[actionName];
+            if (action == null)
+            {
+                Debug.LogWarning($"[Input] missing action: {actionName}");
+                return;
+            }
+
+            action.performed += callback;
+        }
+
+        private bool IsTargetingBlockedAction(string actionName)
+        {
+            if (_playerAttackCaster != null && _playerAttackCaster.IsTargeting)
+            {
+                Debug.Log($"[Input] blocked: action={actionName} reason=targeting");
+                return true;
+            }
+
+            if (_playerAttackCaster != null && _playerAttackCaster.IsCastingLocked)
+            {
+                Debug.Log($"[Input] blocked: action={actionName} reason=cast_locked");
+                return true;
+            }
+
+            return false;
         }
     }
 }

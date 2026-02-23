@@ -120,6 +120,33 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": true
                 },
                 {
+                    ""name"": ""CastQ"",
+                    ""type"": ""Button"",
+                    ""id"": ""72fb9c6d-08f6-44e3-8e4f-a2ee1f26aa01"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""CastE"",
+                    ""type"": ""Button"",
+                    ""id"": ""9c3a0f6e-1b9e-4f36-a2d5-16969d07c8d2"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""CastR"",
+                    ""type"": ""Button"",
+                    ""id"": ""f2d2a390-5fbe-45a0-a4cb-c876213ad41e"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
                     ""name"": ""Jump"",
                     ""type"": ""Button"",
                     ""id"": ""265497b4-c8a2-4479-ac94-ca6afa9613ec"",
@@ -401,6 +428,39 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""XR"",
                     ""action"": ""Fire"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""8f3f17c2-9c5f-4f07-92f7-7f1dd8a0ba32"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""CastQ"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6d4d62a9-4f1e-4e70-8b3a-6b7996149138"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""CastE"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4f7ec0eb-7c8d-4c52-9f27-19e00db82d6e"",
+                    ""path"": ""<Keyboard>/r"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""CastR"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -1068,6 +1128,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
         m_Player_Look = m_Player.FindAction("Look", throwIfNotFound: true);
         m_Player_Fire = m_Player.FindAction("Fire", throwIfNotFound: true);
+        m_Player_CastQ = m_Player.FindAction("CastQ", throwIfNotFound: true);
+        m_Player_CastE = m_Player.FindAction("CastE", throwIfNotFound: true);
+        m_Player_CastR = m_Player.FindAction("CastR", throwIfNotFound: true);
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
         m_Player_Parry = m_Player.FindAction("Parry", throwIfNotFound: true);
         m_Player_CastDebuff = m_Player.FindAction("CastDebuff", throwIfNotFound: true);
@@ -1171,6 +1234,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Move;
     private readonly InputAction m_Player_Look;
     private readonly InputAction m_Player_Fire;
+    private readonly InputAction m_Player_CastQ;
+    private readonly InputAction m_Player_CastE;
+    private readonly InputAction m_Player_CastR;
     private readonly InputAction m_Player_Jump;
     private readonly InputAction m_Player_Parry;
     private readonly InputAction m_Player_CastDebuff;
@@ -1201,6 +1267,18 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/Fire".
         /// </summary>
         public InputAction @Fire => m_Wrapper.m_Player_Fire;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/CastQ".
+        /// </summary>
+        public InputAction @CastQ => m_Wrapper.m_Player_CastQ;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/CastE".
+        /// </summary>
+        public InputAction @CastE => m_Wrapper.m_Player_CastE;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/CastR".
+        /// </summary>
+        public InputAction @CastR => m_Wrapper.m_Player_CastR;
         /// <summary>
         /// Provides access to the underlying input action "Player/Jump".
         /// </summary>
@@ -1264,6 +1342,15 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Fire.started += instance.OnFire;
             @Fire.performed += instance.OnFire;
             @Fire.canceled += instance.OnFire;
+            @CastQ.started += instance.OnCastQ;
+            @CastQ.performed += instance.OnCastQ;
+            @CastQ.canceled += instance.OnCastQ;
+            @CastE.started += instance.OnCastE;
+            @CastE.performed += instance.OnCastE;
+            @CastE.canceled += instance.OnCastE;
+            @CastR.started += instance.OnCastR;
+            @CastR.performed += instance.OnCastR;
+            @CastR.canceled += instance.OnCastR;
             @Jump.started += instance.OnJump;
             @Jump.performed += instance.OnJump;
             @Jump.canceled += instance.OnJump;
@@ -1305,6 +1392,15 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Fire.started -= instance.OnFire;
             @Fire.performed -= instance.OnFire;
             @Fire.canceled -= instance.OnFire;
+            @CastQ.started -= instance.OnCastQ;
+            @CastQ.performed -= instance.OnCastQ;
+            @CastQ.canceled -= instance.OnCastQ;
+            @CastE.started -= instance.OnCastE;
+            @CastE.performed -= instance.OnCastE;
+            @CastE.canceled -= instance.OnCastE;
+            @CastR.started -= instance.OnCastR;
+            @CastR.performed -= instance.OnCastR;
+            @CastR.canceled -= instance.OnCastR;
             @Jump.started -= instance.OnJump;
             @Jump.performed -= instance.OnJump;
             @Jump.canceled -= instance.OnJump;
@@ -1647,6 +1743,27 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnFire(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "CastQ" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnCastQ(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "CastE" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnCastE(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "CastR" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnCastR(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "Jump" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>

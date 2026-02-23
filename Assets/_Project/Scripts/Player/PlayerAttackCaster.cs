@@ -14,22 +14,18 @@ namespace WizardBrawl.Player
     /// </summary>
     public class PlayerAttackCaster : BaseCaster
     {
-        [Header("기본 스킬 슬롯(Q/E/R)")]
-        [Tooltip("Q 키 슬롯 기본 마법 데이터.")]
-        [SerializeField] private MagicData _baseDebuffMagic;
+        [Header("마법 슬롯")]
+        [Tooltip("주 공격으로 사용할 마법의 데이터 에셋.")]
+        [SerializeField] private MagicData _primaryAttackMagic;
+        
+        [Tooltip("Q 슬롯 입력 시 사용할 마법 데이터.")]
+        [SerializeField] private MagicData _qSlotMagic;
 
-        [Tooltip("E 키 슬롯 기본 마법 데이터.")]
-        [SerializeField] private MagicData _baseCrowdControlMagic;
+        [Tooltip("E 슬롯 입력 시 사용할 마법 데이터.")]
+        [SerializeField] private MagicData _eSlotMagic;
 
-        [Tooltip("R 키 슬롯 기본 마법 데이터.")]
-        [SerializeField] private MagicData _baseUltimateMagic;
-
-        [Header("Spell Recipe")]
-        [Tooltip("체인 레시피 매핑 테이블. 지정 시 조합별 레시피를 우선 적용함.")]
-        [SerializeField] private SpellRecipeTable _spellRecipeTable;
-
-        [Tooltip("주입 소효과 테이블. (ImpactType + Element) 키 기반")]
-        [SerializeField] private InjectionEffectTable _injectionEffectTable;
+        [Tooltip("R 슬롯 입력 시 사용할 마법 데이터.")]
+        [SerializeField] private MagicData _rSlotMagic;
 
         [Tooltip("체인 대효과 테이블. (Stage + From + To) 키 기반")]
         [SerializeField] private ChainEffectTable _chainEffectTable;
@@ -61,44 +57,35 @@ namespace WizardBrawl.Player
         [Tooltip("인디케이터가 바닥에 묻히지 않도록 올릴 높이 오프셋.")]
         [SerializeField] private float _targetingIndicatorHeightOffset = 0.05f;
 
-        [Header("타겟팅 카메라 입력 잠금")]
-        [Tooltip("타겟팅 중 비활성화할 카메라 입력 컴포넌트(예: Cinemachine Input Axis Controller).")]
-        [SerializeField] private Behaviour _cameraLookInputController;
+        [Header("타겟팅 인디케이터 반경 동기화")]
+        [Tooltip("인디케이터 원본 크기 대비 지름 배율.")]
+        [SerializeField] private float _targetingIndicatorScaleMultiplier = 1f;
 
-        [Header("타겟팅 이동 잠금")]
-        [Tooltip("타겟팅 중 이동을 잠글 PlayerMovement. 미지정 시 같은 오브젝트에서 자동 탐색함.")]
+        [Tooltip("반경 정보를 읽지 못했을 때 사용할 기본 반경.")]
+        [SerializeField] private float _defaultTargetingIndicatorRadius = 1.5f;
+
+        [Tooltip("인디케이터 지름 최소값.")]
+        [SerializeField] private float _targetingIndicatorMinDiameter = 1f;
+
+        [Header("타겟팅 이동 참조")]
+        [Tooltip("타겟팅 상태를 참조할 PlayerMovement. 미지정 시 같은 오브젝트에서 자동 탐색함.")]
         [SerializeField] private PlayerMovement _playerMovement;
 
-        [Header("타겟팅 종료 후 카메라 복원")]
-        [Tooltip("타겟팅 종료 직후 카메라 홱회전을 줄이기 위해 입력 복원을 지연함(초).")]
-        [SerializeField] private float _cameraLookRestoreDelay = 0.08f;
+        [Header("캐스팅 타이밍")]
+        [Tooltip("마법 데이터에 캐스팅 시간이 없을 때 사용할 선딜 기본값(초).")]
+        [SerializeField] private float _castWindupTime = 0.12f;
 
-        [Header("Debug")]
-        [Tooltip("true면 1/2/3 키로 슬롯에 R/B/Y를 임시 주입함.")]
-        [SerializeField] private bool _enableDebugElementInjectKeys = true;
+        [Tooltip("마법 데이터에 캐스팅 시간이 없을 때 사용할 후딜 기본값(초).")]
+        [SerializeField] private float _castRecoveryTime = 0.18f;
 
-        private PlayerElementSlot _elementSlot;
         private bool _isTargeting;
-        private PendingCastState _pendingCast;
+        private MagicData _pendingMagic;
+        private bool _pendingUsesUltimateFlow;
         private Vector3 _previewTargetPoint;
         private bool _hasPreviewTargetPoint;
-        private bool _isCameraLookRestorePending;
-        private float _cameraLookRestoreAtTime;
+        private Vector3 _targetingIndicatorBaseScale = Vector3.one;
         private ChainState _chainState = ChainState.None;
-        private SpellRecipeResolver _spellRecipeResolver;
-        private SpellRecipeResolution _lastSpellRecipeResolution;
-        private bool _hasLastSpellRecipeResolution;
-        private ChainEffectEntry _lastChainEffectEntry;
-        private bool _hasLastChainEffectEntry;
-        private SpellRecipeKey _lastResolvedChainKey;
-        private bool _hasLastResolvedChainKey;
-        private SpellDeliveryType _resolvedDeliveryType = SpellDeliveryType.Auto;
-        private SpellImpactType _resolvedImpactType = SpellImpactType.Auto;
-        private readonly InjectionStateService _injectionStateService = new InjectionStateService();
-        private readonly DirectChainStateService _directChainStateService = new DirectChainStateService();
-        private CastPipeline _castPipeline;
-
-        public bool IsTargeting => _isTargeting;
+        private readonly CastTimingService _castTimingService = new CastTimingService();
 
         private enum ChainState
         {
@@ -107,32 +94,12 @@ namespace WizardBrawl.Player
             CrowdControlReady
         }
 
-        private struct PendingCastState
-        {
-            public CastSlotType Slot;
-            public MagicData Magic;
-            public ElementCombinationType Combination;
-            public SpellDeliveryType DeliveryType;
-            public SpellImpactType ImpactType;
-            public bool HadInjectedElement;
-            public ElementType InjectedElement;
-
-            public static PendingCastState Empty => new PendingCastState
-            {
-                Slot = CastSlotType.None,
-                Magic = null,
-                Combination = ElementCombinationType.None,
-                DeliveryType = SpellDeliveryType.Auto,
-                ImpactType = SpellImpactType.Auto,
-                HadInjectedElement = false,
-                InjectedElement = ElementType.None
-            };
-        }
+        public bool IsTargeting => _isTargeting;
+        public bool IsCastingLocked => _castTimingService.IsLocked;
 
         protected override void Awake()
         {
             base.Awake();
-            _elementSlot = GetComponent<PlayerElementSlot>();
             if (_playerMovement == null)
             {
                 _playerMovement = GetComponent<PlayerMovement>();
@@ -143,34 +110,18 @@ namespace WizardBrawl.Player
                 _mainCamera = Camera.main;
             }
 
-            _spellRecipeResolver = _spellRecipeTable == null
-                ? null
-                : new SpellRecipeResolver(_spellRecipeTable);
-            _castPipeline = new CastPipeline(
-                new TableInjectionEffectResolver(_injectionEffectTable),
-                new TableChainEffectResolver(_chainEffectTable),
-                new CompositeCastPresentationSink(
-                    new ChainRuntimeApplierSink(),
-                    new ChainEffectEventPublisherSink(),
-                    new DebugCastPresentationSink()));
+            if (_targetingIndicator != null)
+            {
+                _targetingIndicatorBaseScale = _targetingIndicator.localScale;
+            }
 
+            _castTimingService.Initialize(this);
             SetTargetingIndicatorVisible(false);
         }
 
         private void OnDisable()
         {
-            // 비활성화 시 카메라 입력이 잠긴 채 남지 않도록 복원함.
-            _isTargeting = false;
-            _pendingCast = PendingCastState.Empty;
-            _hasPreviewTargetPoint = false;
-            _isCameraLookRestorePending = false;
-            _cameraLookRestoreAtTime = 0f;
-            _directChainStateService.Reset();
-            _hasLastSpellRecipeResolution = false;
-            _hasLastChainEffectEntry = false;
-            _hasLastResolvedChainKey = false;
-            SetTargetingIndicatorVisible(false);
-            SetCameraLookInputEnabled(true);
+            _castTimingService.Cancel("disable");
             SetPlayerMovementEnabled(true);
             SetSlotMutationLocked(false);
             _injectionStateService.ResetState();
@@ -178,13 +129,7 @@ namespace WizardBrawl.Player
 
         private void Update()
         {
-            HandleDebugElementInjectInput();
-
-            if (!_isTargeting)
-            {
-                TryRestoreCameraLookInput();
-                return;
-            }
+            if (!_isTargeting) return;
 
             UpdateTargetingPreview();
 
@@ -196,10 +141,22 @@ namespace WizardBrawl.Player
             }
         }
 
-        /// <summary>
-        /// 주 공격 마법을 시전함.
-        /// </summary>
-        public void PerformAttack()
+        public void PerformCastQ()
+        {
+            TryStartSlotCast(_qSlotMagic != null ? _qSlotMagic : _primaryAttackMagic, "Q");
+        }
+
+        public void PerformCastE()
+        {
+            TryStartSlotCast(_eSlotMagic != null ? _eSlotMagic : _primaryAttackMagic, "E");
+        }
+
+        public void PerformCastR()
+        {
+            TryStartSlotCast(_rSlotMagic != null ? _rSlotMagic : _primaryAttackMagic, "R");
+        }
+
+        public void PerformTargetConfirm()
         {
             if (_mainCamera == null)
             {
@@ -207,9 +164,8 @@ namespace WizardBrawl.Player
                 return;
             }
 
-            if (_isTargeting)
+            if (!_isTargeting)
             {
-                ConfirmTargetingCast();
                 return;
             }
             Debug.Log("[Attack] blocked: use Q/E/R for casting");
@@ -224,117 +180,66 @@ namespace WizardBrawl.Player
         {
             PerformSlotCast(CastSlotType.E);
         }
-
-        public void PerformUltimateCast()
-        {
-            PerformSlotCast(CastSlotType.R);
+            ConfirmTargetingCast();
         }
 
-        public void ToggleInjectArm()
+        [System.Obsolete("Use PerformCastQ/PerformCastE/PerformCastR and PerformTargetConfirm.")]
+        public void PerformAttack()
         {
+            PerformCastQ();
+        }
+
+        private void TryStartSlotCast(MagicData selectedMagic, string slotName)
+        {
+            if (_mainCamera == null)
+            {
+                Debug.LogError("메인 카메라가 할당되지 않았습니다!", this);
+                return;
+            }
+
+            if (IsCastingLocked)
+            {
+                Debug.Log($"[CastState] blocked: slot={slotName}, state={_castTimingService.State}");
+                return;
+            }
+
             if (_isTargeting)
             {
-                Debug.Log("[Inject] blocked: targeting_in_progress");
+                Debug.Log($"[Input] blocked: action={slotName} reason=targeting");
                 return;
             }
 
-            bool isArmed = _injectionStateService.ToggleArm();
-            Debug.Log($"[Inject] armed={isArmed}");
-        }
-
-        private void ResolveExecutionKinds(ElementCombinationType combo, MagicData selectedMagic)
-        {
-            SpellDeliveryType fallbackDelivery = ResolveFallbackDeliveryType(combo, selectedMagic);
-            SpellImpactType fallbackImpact = ResolveFallbackImpactType(combo, selectedMagic);
-
-            if (_hasLastSpellRecipeResolution && _lastSpellRecipeResolution.HasRecipe && _lastSpellRecipeResolution.Entry != null)
+            if (selectedMagic == null)
             {
-                SpellRecipeEntry entry = _lastSpellRecipeResolution.Entry;
-                _resolvedDeliveryType = entry.DeliveryType == SpellDeliveryType.Auto ? fallbackDelivery : entry.DeliveryType;
-                _resolvedImpactType = entry.ImpactType == SpellImpactType.Auto ? fallbackImpact : entry.ImpactType;
-                Debug.Log($"[SpellRecipe] execution delivery={_resolvedDeliveryType} impact={_resolvedImpactType} source=recipe");
+                Debug.LogWarning($"[CastResult] blocked: slot={slotName} reason=magic_not_assigned");
                 return;
             }
 
-            _resolvedDeliveryType = fallbackDelivery;
-            _resolvedImpactType = fallbackImpact;
-            Debug.Log($"[SpellRecipe] execution delivery={_resolvedDeliveryType} impact={_resolvedImpactType} source=fallback");
+            if (RequiresTargeting(selectedMagic))
+            {
+                EnterTargeting(selectedMagic, slotName);
+                return;
+            }
+
+            Vector3 fallbackPoint = _mainCamera.transform.position + (_mainCamera.transform.forward * _targetingMaxDistance);
+            StartCastSequence(selectedMagic, selectedMagic.UseUltimateFlow, fallbackPoint, $"slot={slotName}");
         }
 
-        private static SpellDeliveryType ResolveFallbackDeliveryType(ElementCombinationType combo, MagicData selectedMagic)
+        private static bool RequiresTargeting(MagicData selectedMagic)
         {
-            if (selectedMagic != null && selectedMagic.DefaultDeliveryType != SpellDeliveryType.Auto)
-            {
-                return selectedMagic.DefaultDeliveryType;
-            }
-
-            if (selectedMagic is DebuffMagicData || selectedMagic is ProjectileMagicData)
-            {
-                return SpellDeliveryType.Projectile;
-            }
-
-            if (selectedMagic is CrowdControlMagicData)
-            {
-                return SpellDeliveryType.Area;
-            }
-
-            return SpellDeliveryType.Projectile;
+            return selectedMagic != null && selectedMagic.CastMode == MagicCastMode.Targeted;
         }
 
-        private static SpellImpactType ResolveFallbackImpactType(ElementCombinationType combo, MagicData selectedMagic)
-        {
-            if (selectedMagic != null && selectedMagic.DefaultImpactType != SpellImpactType.Auto)
-            {
-                return selectedMagic.DefaultImpactType;
-            }
-
-            if (selectedMagic is DebuffMagicData)
-            {
-                return SpellImpactType.Debuff;
-            }
-
-            if (selectedMagic is CrowdControlMagicData)
-            {
-                return SpellImpactType.CrowdControl;
-            }
-
-            return SpellImpactType.None;
-        }
-
-        private bool RequiresTargeting()
-        {
-            return _resolvedDeliveryType == SpellDeliveryType.Area
-                || _resolvedDeliveryType == SpellDeliveryType.Meteor;
-        }
-
-        private void EnterTargeting(
-            CastSlotType slot,
-            MagicData selectedMagic,
-            ElementCombinationType combo,
-            SpellDeliveryType deliveryType,
-            SpellImpactType impactType,
-            bool hadInjectedElement,
-            ElementType injectedElement)
+        private void EnterTargeting(MagicData selectedMagic, string slotName)
         {
             _isTargeting = true;
-            _pendingCast = new PendingCastState
-            {
-                Slot = slot,
-                Magic = selectedMagic,
-                Combination = combo,
-                DeliveryType = deliveryType,
-                ImpactType = impactType,
-                HadInjectedElement = hadInjectedElement,
-                InjectedElement = injectedElement
-            };
+            _pendingMagic = selectedMagic;
+            _pendingUsesUltimateFlow = selectedMagic != null && selectedMagic.UseUltimateFlow;
             _hasPreviewTargetPoint = false;
+            SyncTargetingIndicatorScale(selectedMagic);
             SetTargetingIndicatorVisible(true);
-            _isCameraLookRestorePending = false;
-            SetCameraLookInputEnabled(false);
-            SetPlayerMovementEnabled(false);
-            SetSlotMutationLocked(true);
             UpdateTargetingPreview();
-            Debug.Log($"[Targeting] enter: magic={selectedMagic?.MagicName ?? "None"}, combo={combo}, delivery={deliveryType}, impact={impactType}");
+            Debug.Log($"[Targeting] enter: slot={slotName}, magic={selectedMagic?.MagicName ?? "None"}");
         }
 
         private void ConfirmTargetingCast()
@@ -346,35 +251,21 @@ namespace WizardBrawl.Player
             }
 
             Vector3 cursorPoint = _previewTargetPoint;
-
-            if (TryCastSelectedMagic(
-                _pendingCast.Slot,
-                _pendingCast.Magic,
-                _pendingCast.Combination,
-                _pendingCast.ImpactType,
-                cursorPoint,
-                _pendingCast.HadInjectedElement,
-                _pendingCast.InjectedElement))
+          
+            bool castStarted = StartCastSequence(_pendingMagic, _pendingUsesUltimateFlow, cursorPoint, "target_confirm");
+            if (castStarted)
             {
                 bool hasCurrentCursorPoint = TryGetTargetPoint(out Vector3 currentCursorPoint);
                 float targetingDelta = hasCurrentCursorPoint
                     ? Vector3.Distance(currentCursorPoint, cursorPoint)
                     : 0f;
                 Debug.Log($"[Targeting] delta: cursorNow={(hasCurrentCursorPoint ? currentCursorPoint.ToString() : "N/A")} cast={cursorPoint} value={targetingDelta:F3}");
-                Debug.Log("[Targeting] confirm: cast success");
-                _isTargeting = false;
-                _pendingCast = PendingCastState.Empty;
-                _injectionStateService.ConfirmQueued(_elementSlot);
-                _directChainStateService.ConfirmPendingAndRecordSuccess();
-                _hasPreviewTargetPoint = false;
-                SetTargetingIndicatorVisible(false);
-                ScheduleCameraLookRestore();
-                SetPlayerMovementEnabled(true);
-                SetSlotMutationLocked(false);
+                Debug.Log("[Targeting] confirm: cast queued");
+                ExitTargetingState();
             }
             else
             {
-                Debug.Log("[Targeting] confirm: cast failed");
+                Debug.Log("[Targeting] confirm: cast queue failed");
                 CancelTargeting("cast_failed");
             }
         }
@@ -382,31 +273,50 @@ namespace WizardBrawl.Player
         private void CancelTargeting(string reason)
         {
             Debug.Log($"[Targeting] cancel: reason={reason}");
-            _isTargeting = false;
-            _pendingCast = PendingCastState.Empty;
-            if (_injectionStateService.CancelQueued())
-            {
-                Debug.Log("[Inject] rearmed: targeting cancelled before consume");
-            }
-            _directChainStateService.ClearPending();
-            _hasPreviewTargetPoint = false;
-            SetTargetingIndicatorVisible(false);
-            ScheduleCameraLookRestore();
-            SetPlayerMovementEnabled(true);
-            SetSlotMutationLocked(false);
+            ExitTargetingState();
         }
 
-        private bool TryCastSelectedMagic(
-            CastSlotType slot,
-            MagicData selectedMagic,
-            ElementCombinationType combo,
-            SpellImpactType impactType,
-            Vector3 targetPoint,
-            bool hadInjectedElement,
-            ElementType injectedElement)
+        private void ExitTargetingState()
+        {
+            _isTargeting = false;
+            _pendingMagic = null;
+            _pendingUsesUltimateFlow = false;
+            _hasPreviewTargetPoint = false;
+            SetTargetingIndicatorVisible(false);
+        }
+
+        private bool StartCastSequence(MagicData selectedMagic, bool usesUltimateFlow, Vector3 targetPoint, string source)
+        {
+            if (selectedMagic == null)
+            {
+                Debug.LogWarning($"[CastState] blocked: source={source}, reason=null_magic");
+                return false;
+            }
+
+            if (IsCastingLocked)
+            {
+                Debug.Log($"[CastState] blocked: source={source}, state={_castTimingService.State}");
+                return false;
+            }
+
+            if (!CanUseSkillNow(selectedMagic))
+            {
+                Debug.Log($"[CastState] blocked: source={source}, magic={selectedMagic.MagicName}, reason=resource_or_cooldown");
+                return false;
+            }
+
+            return _castTimingService.TryBegin(
+                ResolveCastWindupTime(selectedMagic),
+                ResolveCastRecoveryTime(selectedMagic),
+                () => TryCastSelectedMagic(selectedMagic, usesUltimateFlow, targetPoint),
+                source,
+                selectedMagic.MagicName);
+        }
+
+        private bool TryCastSelectedMagic(MagicData selectedMagic, bool usesUltimateFlow, Vector3 targetPoint)
         {
             Vector3 fireDirection = BuildFireDirection(targetPoint);
-            if (impactType == SpellImpactType.Ultimate)
+            if (usesUltimateFlow)
             {
                 bool ultimateCastSuccess = TryCastUltimate(selectedMagic, fireDirection, targetPoint);
                 if (ultimateCastSuccess)
@@ -740,12 +650,7 @@ namespace WizardBrawl.Player
                 return false;
             }
 
-            if (Mouse.current == null)
-            {
-                return false;
-            }
-
-            Ray ray = _mainCamera.ScreenPointToRay(Mouse.current.position.ReadValue());
+            Ray ray = _mainCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
             if (Physics.Raycast(ray, out RaycastHit hit, _targetingMaxDistance, _targetGroundLayers))
             {
                 targetPoint = hit.point;
@@ -792,12 +697,46 @@ namespace WizardBrawl.Player
             }
         }
 
-        private void SetCameraLookInputEnabled(bool enabled)
+        private void SyncTargetingIndicatorScale(MagicData selectedMagic)
         {
-            if (_cameraLookInputController != null)
+            if (_targetingIndicator == null)
             {
-                _cameraLookInputController.enabled = enabled;
+                return;
             }
+
+            float radius = ResolveTargetingRadius(selectedMagic);
+            float diameter = Mathf.Max(_targetingIndicatorMinDiameter, radius * 2f * Mathf.Max(0.01f, _targetingIndicatorScaleMultiplier));
+            _targetingIndicator.localScale = new Vector3(_targetingIndicatorBaseScale.x * diameter, _targetingIndicatorBaseScale.y, _targetingIndicatorBaseScale.z * diameter);
+        }
+
+        private float ResolveTargetingRadius(MagicData selectedMagic)
+        {
+            if (selectedMagic is CrowdControlMagicData crowdControlMagic)
+            {
+                return Mathf.Max(0.1f, crowdControlMagic.Radius);
+            }
+
+            return _defaultTargetingIndicatorRadius;
+        }
+
+        private float ResolveCastWindupTime(MagicData selectedMagic)
+        {
+            if (selectedMagic == null)
+            {
+                return Mathf.Max(0f, _castWindupTime);
+            }
+
+            return Mathf.Max(0f, selectedMagic.CastWindupTime);
+        }
+
+        private float ResolveCastRecoveryTime(MagicData selectedMagic)
+        {
+            if (selectedMagic == null)
+            {
+                return Mathf.Max(0f, _castRecoveryTime);
+            }
+
+            return Mathf.Max(0f, selectedMagic.CastRecoveryTime);
         }
 
         private void SetPlayerMovementEnabled(bool enabled)
@@ -806,37 +745,6 @@ namespace WizardBrawl.Player
             {
                 _playerMovement.CanMove = enabled;
             }
-        }
-
-        private void SetSlotMutationLocked(bool isLocked)
-        {
-            if (_elementSlot != null)
-            {
-                _elementSlot.SetMutationLocked(isLocked);
-            }
-        }
-
-        private void ScheduleCameraLookRestore()
-        {
-            _isCameraLookRestorePending = true;
-            _cameraLookRestoreAtTime = Time.time + Mathf.Max(0f, _cameraLookRestoreDelay);
-            SetCameraLookInputEnabled(false);
-        }
-
-        private void TryRestoreCameraLookInput()
-        {
-            if (!_isCameraLookRestorePending)
-            {
-                return;
-            }
-
-            if (Time.time < _cameraLookRestoreAtTime)
-            {
-                return;
-            }
-
-            _isCameraLookRestorePending = false;
-            SetCameraLookInputEnabled(true);
         }
 
         private Vector3 BuildFireDirection(Vector3 targetPoint)
@@ -850,58 +758,5 @@ namespace WizardBrawl.Player
 
             return fireDirection.normalized;
         }
-
-        private static void ResolveEffectTargeting(MagicData selectedMagic, out float radius, out int layerMask)
-        {
-            radius = 0f;
-            layerMask = 0;
-
-            if (selectedMagic is CrowdControlMagicData ccData)
-            {
-                radius = ccData.Radius;
-                layerMask = ccData.TargetLayers.value;
-                return;
-            }
-
-            if (selectedMagic is DebuffMagicData debuffData)
-            {
-                radius = debuffData.BurstRadius;
-                layerMask = debuffData.TargetLayers.value;
-            }
-        }
-
-        private void NotifyCastPipeline(
-            CastSlotType slot,
-            SpellImpactType impactType,
-            MagicData selectedMagic,
-            ElementCombinationType combo,
-            Vector3 targetPoint,
-            bool hadInjectedElement,
-            ElementType injectedElement)
-        {
-            if (_castPipeline == null)
-            {
-                return;
-            }
-
-            ResolveEffectTargeting(selectedMagic, out float effectRadius, out int effectLayerMask);
-
-            CastContext context = new CastContext(
-                gameObject,
-                slot,
-                impactType,
-                selectedMagic,
-                injectedElement,
-                hadInjectedElement,
-                combo,
-                targetPoint,
-                effectRadius,
-                effectLayerMask,
-                _hasLastResolvedChainKey ? _lastResolvedChainKey.Stage : ChainStage.None,
-                _hasLastResolvedChainKey ? _lastResolvedChainKey.FromElement : ElementType.None,
-                _hasLastResolvedChainKey ? _lastResolvedChainKey.ToElement : ElementType.None);
-            _castPipeline.ProcessOnHit(context);
-        }
-
     }
 }
