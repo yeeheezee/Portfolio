@@ -1384,14 +1384,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _magicSpawnPoint: {fileID: 615457412}
-  _primaryAttackMagic: {fileID: 11400000, guid: d845cc96ad95f924cbedff773867b91b, type: 2}
+  _primaryAttackMagic: {fileID: 11400000, guid: da8f6eb394976824fafb9b296781f200, type: 2}
+  _qSlotMagic: {fileID: 11400000, guid: da8f6eb394976824fafb9b296781f200, type: 2}
+  _eSlotMagic: {fileID: 11400000, guid: d845cc96ad95f924cbedff773867b91b, type: 2}
+  _rSlotMagic: {fileID: 11400000, guid: 2ac53af184aa62645b66f7d09f614018, type: 2}
   _rrMagic: {fileID: 11400000, guid: da8f6eb394976824fafb9b296781f200, type: 2}
   _bbMagic: {fileID: 11400000, guid: da8f6eb394976824fafb9b296781f200, type: 2}
   _yyMagic: {fileID: 11400000, guid: da8f6eb394976824fafb9b296781f200, type: 2}
   _rbMagic: {fileID: 11400000, guid: da8f6eb394976824fafb9b296781f200, type: 2}
   _ryMagic: {fileID: 11400000, guid: d845cc96ad95f924cbedff773867b91b, type: 2}
   _byMagic: {fileID: 11400000, guid: d845cc96ad95f924cbedff773867b91b, type: 2}
-  _baseUltimateMagic: {fileID: 0}
+  _baseUltimateMagic: {fileID: 11400000, guid: 2ac53af184aa62645b66f7d09f614018, type: 2}
   _mainCamera: {fileID: 862714789}
   _targetGroundLayers:
     serializedVersion: 2
@@ -1402,9 +1405,10 @@ MonoBehaviour:
   _targetValidColor: {r: 0, g: 1, b: 0, a: 1}
   _targetInvalidColor: {r: 1, g: 0, b: 0, a: 1}
   _targetingIndicatorHeightOffset: 0.05
-  _cameraLookInputController: {fileID: 1507257992}
+  _targetingIndicatorScaleMultiplier: 1
+  _defaultTargetingIndicatorRadius: 1.5
+  _targetingIndicatorMinDiameter: 1
   _playerMovement: {fileID: 0}
-  _cameraLookRestoreDelay: 0.08
 --- !u!114 &978692064
 MonoBehaviour:
   m_ObjectHideFlags: 0

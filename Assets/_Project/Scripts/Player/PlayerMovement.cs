@@ -15,6 +15,9 @@ namespace WizardBrawl.Player
         [Tooltip("캐릭터가 목표 방향을 바라보는 데 걸리는 시간. 낮을수록 빠르게 회전.")]
         [SerializeField] private float rotationSmoothTime = 0.1f;
 
+        [Tooltip("활성화 시 이동 입력과 무관하게 카메라 정면을 따라 회전함.")]
+        [SerializeField] private bool rotateWithCamera = true;
+
         [Tooltip("속도 변화의 최대치를 제한하여 물리력이 강하게 적용되는 것을 방지.")]
         [SerializeField] private float maxVelocityChange = 20.0f;
 
@@ -98,8 +101,27 @@ namespace WizardBrawl.Player
         /// </summary>
         private void HandleRotation()
         {
-            if (_targetDirection == Vector3.zero) return;
-            float targetAngle = Mathf.Atan2(_targetDirection.x, _targetDirection.z) * Mathf.Rad2Deg;
+            Vector3 rotationDirection;
+            if (rotateWithCamera)
+            {
+                rotationDirection = _mainCameraTransform.forward;
+                rotationDirection.y = 0f;
+                if (rotationDirection.sqrMagnitude < 0.0001f)
+                {
+                    return;
+                }
+            }
+            else
+            {
+                if (_targetDirection == Vector3.zero)
+                {
+                    return;
+                }
+
+                rotationDirection = _targetDirection;
+            }
+
+            float targetAngle = Mathf.Atan2(rotationDirection.x, rotationDirection.z) * Mathf.Rad2Deg;
             float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref _targetRotationVelocity, rotationSmoothTime);
             transform.rotation = Quaternion.Euler(0f, angle, 0f);
         }
