@@ -9,6 +9,7 @@ namespace WizardBrawl.Player
     [RequireComponent(typeof(PlayerMovement))]
     [RequireComponent(typeof(PlayerJump))]
     [RequireComponent(typeof(PlayerAttackCaster))]
+    [RequireComponent(typeof(PlayerElementSlot))]
     /// <summary>
     /// Move 액션에서 동적 매개변수 함수에 대해 읽어오지 못하는 오류가 있어 코드 레벨에서 직접 연결할 수 있도록 스크립트 생성
     /// </summary>
@@ -38,7 +39,15 @@ namespace WizardBrawl.Player
             _playerJump = GetComponent<PlayerJump>();
             _playerAttackCaster = GetComponent<PlayerAttackCaster>();
             _manaParry = GetComponentInChildren<MagicParry>();
-
+            _moveAction = FindAction("Move");
+            _fireAction = FindAction("Fire");
+            _jumpAction = FindAction("Jump");
+            _parryAction = FindAction("Parry");
+            _castDebuffAction = FindAction("CastDebuff");
+            _castCrowdControlAction = FindAction("CastCrowdControl");
+            _castUltimateAction = FindAction("CastUltimate");
+            _sprintAction = FindAction("Sprint");
+            _armInjectAction = FindAction("ArmInject");
             _playerInput.actions["Move"].performed += context => _playerMovement.SetMoveInput(context.ReadValue<Vector2>());
             _playerInput.actions["Move"].canceled += context => _playerMovement.SetMoveInput(Vector2.zero);
             _playerInput.actions["Jump"].performed += context => _playerJump.PerformJump();

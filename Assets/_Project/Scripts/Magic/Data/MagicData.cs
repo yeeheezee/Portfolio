@@ -1,5 +1,6 @@
 using UnityEngine;
 using WizardBrawl.Core;
+using WizardBrawl.Magic.Data.SpellRecipe;
 
 namespace WizardBrawl.Magic.Data
 {

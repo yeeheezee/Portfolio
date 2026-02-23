@@ -23,7 +23,7 @@ namespace WizardBrawl.Magic.Effects
         /// <summary>
         /// 디버프 투사체를 생성하고 초기화 후 발사함.
         /// </summary>
-        public void Execute(GameObject caster, Transform spawnPoint, Vector3 fireDirection)
+        public void Execute(GameObject caster, Transform spawnPoint, Vector3 fireDirection, Vector3 targetPoint)
         {
             if (_data.ProjectilePrefab == null)
             {
