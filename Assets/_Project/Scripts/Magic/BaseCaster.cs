@@ -39,13 +39,23 @@ namespace WizardBrawl.Magic
         /// <param name="fireDirection">마법 발사 방향.</param>
         protected void UseSkill(MagicData skill, Vector3 fireDirection)
         {
-            TryUseSkill(skill, fireDirection);
+            Vector3 defaultTargetPoint = _magicSpawnPoint.position;
+            TryUseSkill(skill, fireDirection, defaultTargetPoint);
         }
 
         /// <summary>
         /// 마법 스킬 시도를 수행하고 성공 여부를 반환함.
         /// </summary>
         protected bool TryUseSkill(MagicData skill, Vector3 fireDirection)
+        {
+            Vector3 defaultTargetPoint = _magicSpawnPoint.position;
+            return TryUseSkill(skill, fireDirection, defaultTargetPoint);
+        }
+
+        /// <summary>
+        /// 마법 스킬 시도를 수행하고 성공 여부를 반환함.
+        /// </summary>
+        protected bool TryUseSkill(MagicData skill, Vector3 fireDirection, Vector3 targetPoint)
         {
             if (skill == null)
             {
@@ -61,7 +71,7 @@ namespace WizardBrawl.Magic
             }
 
             _mana.UseMana(skill.ManaCost);
-            skill.CreateEffect().Execute(gameObject, _magicSpawnPoint, fireDirection);
+            skill.CreateEffect().Execute(gameObject, _magicSpawnPoint, fireDirection, targetPoint);
             _cooldownTimers[skill] = Time.time;
             return true;
         }

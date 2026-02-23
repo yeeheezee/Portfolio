@@ -22,9 +22,9 @@ namespace WizardBrawl.Magic.Effects
         /// <summary>
         /// 지정 범위의 대상에게 CC 상태 이벤트를 적용함.
         /// </summary>
-        public void Execute(GameObject caster, Transform spawnPoint, Vector3 fireDirection)
+        public void Execute(GameObject caster, Transform spawnPoint, Vector3 fireDirection, Vector3 targetPoint)
         {
-            Collider[] hits = Physics.OverlapSphere(spawnPoint.position, _data.Radius, _data.TargetLayers);
+            Collider[] hits = Physics.OverlapSphere(targetPoint, _data.Radius, _data.TargetLayers);
             int appliedCount = 0;
 
             for (int i = 0; i < hits.Length; i++)

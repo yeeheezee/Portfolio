@@ -136,6 +136,51 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""CastDebuff"",
+                    ""type"": ""Button"",
+                    ""id"": ""5c205750-57db-4fbe-b4d6-7fd5b32f5931"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""CastCrowdControl"",
+                    ""type"": ""Button"",
+                    ""id"": ""376e6f7f-7dbe-4f91-8894-9b8162256757"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""CastUltimate"",
+                    ""type"": ""Button"",
+                    ""id"": ""fbf7d2db-4067-4e2a-8c06-4f2208fcd74c"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Sprint"",
+                    ""type"": ""Button"",
+                    ""id"": ""5f22dd47-6db7-45f9-8e33-04a7213e4d3e"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ArmInject"",
+                    ""type"": ""Button"",
+                    ""id"": ""c1609138-81c6-4d7d-b5fb-a160746f60e3"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -378,6 +423,61 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse;Gamepad"",
                     ""action"": ""Parry"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6fa7622b-c8c7-4ae2-a146-ac85de71596d"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""CastDebuff"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""44d34a7f-2eb2-4733-8c43-dd49d84e5f8e"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""CastCrowdControl"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f91cd79f-bf87-4bf0-a58f-b09a46b9f80d"",
+                    ""path"": ""<Keyboard>/r"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""CastUltimate"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5c78cb74-a7c6-4817-a8de-8e8d02fcc2dd"",
+                    ""path"": ""<Keyboard>/leftShift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""Sprint"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""db40dd0a-4ae1-4775-9116-8790d3af024f"",
+                    ""path"": ""<Mouse>/middleButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""ArmInject"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -970,6 +1070,11 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_Player_Fire = m_Player.FindAction("Fire", throwIfNotFound: true);
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
         m_Player_Parry = m_Player.FindAction("Parry", throwIfNotFound: true);
+        m_Player_CastDebuff = m_Player.FindAction("CastDebuff", throwIfNotFound: true);
+        m_Player_CastCrowdControl = m_Player.FindAction("CastCrowdControl", throwIfNotFound: true);
+        m_Player_CastUltimate = m_Player.FindAction("CastUltimate", throwIfNotFound: true);
+        m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
+        m_Player_ArmInject = m_Player.FindAction("ArmInject", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1068,6 +1173,11 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Fire;
     private readonly InputAction m_Player_Jump;
     private readonly InputAction m_Player_Parry;
+    private readonly InputAction m_Player_CastDebuff;
+    private readonly InputAction m_Player_CastCrowdControl;
+    private readonly InputAction m_Player_CastUltimate;
+    private readonly InputAction m_Player_Sprint;
+    private readonly InputAction m_Player_ArmInject;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -1099,6 +1209,26 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/Parry".
         /// </summary>
         public InputAction @Parry => m_Wrapper.m_Player_Parry;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/CastDebuff".
+        /// </summary>
+        public InputAction @CastDebuff => m_Wrapper.m_Player_CastDebuff;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/CastCrowdControl".
+        /// </summary>
+        public InputAction @CastCrowdControl => m_Wrapper.m_Player_CastCrowdControl;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/CastUltimate".
+        /// </summary>
+        public InputAction @CastUltimate => m_Wrapper.m_Player_CastUltimate;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/Sprint".
+        /// </summary>
+        public InputAction @Sprint => m_Wrapper.m_Player_Sprint;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/ArmInject".
+        /// </summary>
+        public InputAction @ArmInject => m_Wrapper.m_Player_ArmInject;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1140,6 +1270,21 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Parry.started += instance.OnParry;
             @Parry.performed += instance.OnParry;
             @Parry.canceled += instance.OnParry;
+            @CastDebuff.started += instance.OnCastDebuff;
+            @CastDebuff.performed += instance.OnCastDebuff;
+            @CastDebuff.canceled += instance.OnCastDebuff;
+            @CastCrowdControl.started += instance.OnCastCrowdControl;
+            @CastCrowdControl.performed += instance.OnCastCrowdControl;
+            @CastCrowdControl.canceled += instance.OnCastCrowdControl;
+            @CastUltimate.started += instance.OnCastUltimate;
+            @CastUltimate.performed += instance.OnCastUltimate;
+            @CastUltimate.canceled += instance.OnCastUltimate;
+            @Sprint.started += instance.OnSprint;
+            @Sprint.performed += instance.OnSprint;
+            @Sprint.canceled += instance.OnSprint;
+            @ArmInject.started += instance.OnArmInject;
+            @ArmInject.performed += instance.OnArmInject;
+            @ArmInject.canceled += instance.OnArmInject;
         }
 
         /// <summary>
@@ -1166,6 +1311,21 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Parry.started -= instance.OnParry;
             @Parry.performed -= instance.OnParry;
             @Parry.canceled -= instance.OnParry;
+            @CastDebuff.started -= instance.OnCastDebuff;
+            @CastDebuff.performed -= instance.OnCastDebuff;
+            @CastDebuff.canceled -= instance.OnCastDebuff;
+            @CastCrowdControl.started -= instance.OnCastCrowdControl;
+            @CastCrowdControl.performed -= instance.OnCastCrowdControl;
+            @CastCrowdControl.canceled -= instance.OnCastCrowdControl;
+            @CastUltimate.started -= instance.OnCastUltimate;
+            @CastUltimate.performed -= instance.OnCastUltimate;
+            @CastUltimate.canceled -= instance.OnCastUltimate;
+            @Sprint.started -= instance.OnSprint;
+            @Sprint.performed -= instance.OnSprint;
+            @Sprint.canceled -= instance.OnSprint;
+            @ArmInject.started -= instance.OnArmInject;
+            @ArmInject.performed -= instance.OnArmInject;
+            @ArmInject.canceled -= instance.OnArmInject;
         }
 
         /// <summary>
@@ -1501,6 +1661,41 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnParry(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "CastDebuff" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnCastDebuff(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "CastCrowdControl" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnCastCrowdControl(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "CastUltimate" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnCastUltimate(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Sprint" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnSprint(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "ArmInject" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnArmInject(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

@@ -7,6 +7,7 @@ namespace WizardBrawl.Player
     /// <summary>
     /// 플레이어의 마법 패링 시스템. IParryable을 구현함.
     /// </summary>
+    [RequireComponent(typeof(Collider))]
     public class MagicParry : MonoBehaviour, IParryable
     {
         [Header("패링 설정")]
@@ -29,11 +30,6 @@ namespace WizardBrawl.Player
             _parryCollider = GetComponent<Collider>();
             _playerMana = GetComponentInParent<Mana>();
             _playerElementSlot = GetComponentInParent<PlayerElementSlot>();
-
-            if (_playerElementSlot == null && _playerMana != null)
-            {
-                _playerElementSlot = _playerMana.gameObject.AddComponent<PlayerElementSlot>();
-            }
 
             if (_parryCollider == null || _playerMana == null || _playerElementSlot == null)
             {

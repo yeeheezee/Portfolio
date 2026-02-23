@@ -25,7 +25,8 @@ namespace WizardBrawl.Magic.Effects
         /// <param name="caster">마법을 시전한 주체.</param>
         /// <param name="spawnPoint">마법 효과가 시작될 위치와 방향.</param>
         /// <param name="fireDirection">마법이 나아갈 초기 방향.</param>
-        public void Execute(GameObject caster, Transform spawnPoint, Vector3 fireDirection)
+        /// <param name="targetPoint">목표 지점(투사체형에서는 사용하지 않음).</param>
+        public void Execute(GameObject caster, Transform spawnPoint, Vector3 fireDirection, Vector3 targetPoint)
         {
             if (_data.ProjectilePrefab == null)
             {
