@@ -1,5 +1,6 @@
 using UnityEngine;
 using WizardBrawl.Core;
+using WizardBrawl.Magic.Data.SpellRecipe;
 
 namespace WizardBrawl.Magic.Data
 {
@@ -31,6 +32,13 @@ namespace WizardBrawl.Magic.Data
         [Tooltip("패링 성공 시 플레이어가 획득하는 속성.")]
         [SerializeField] private ElementType _parryElement = ElementType.None;
 
+        [Header("기본 실행 분류")]
+        [Tooltip("기본 전달 방식. Auto면 캐스터의 폴백 규칙을 따름.")]
+        [SerializeField] private SpellDeliveryType _defaultDeliveryType = SpellDeliveryType.Auto;
+
+        [Tooltip("기본 명중 효과 분류. Auto면 캐스터의 폴백 규칙을 따름.")]
+        [SerializeField] private SpellImpactType _defaultImpactType = SpellImpactType.Auto;
+
         public string MagicName => _magicName;
         public string Description => _description;
         public Sprite Icon => _icon;
@@ -38,6 +46,8 @@ namespace WizardBrawl.Magic.Data
         public float Cooldown => _cooldown;
         public bool IsParryable => _isParryable;
         public ElementType ParryElement => _parryElement;
+        public SpellDeliveryType DefaultDeliveryType => _defaultDeliveryType;
+        public SpellImpactType DefaultImpactType => _defaultImpactType;
 
         /// <summary>
         /// 이 데이터에 맞는 마법 실행 로직(IMagicEffect)을 생성하여 반환.

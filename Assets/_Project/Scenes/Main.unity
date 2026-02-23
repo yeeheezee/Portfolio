@@ -1384,14 +1384,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _magicSpawnPoint: {fileID: 615457412}
-  _primaryAttackMagic: {fileID: 11400000, guid: d845cc96ad95f924cbedff773867b91b, type: 2}
-  _rrMagic: {fileID: 11400000, guid: da8f6eb394976824fafb9b296781f200, type: 2}
-  _bbMagic: {fileID: 11400000, guid: da8f6eb394976824fafb9b296781f200, type: 2}
-  _yyMagic: {fileID: 11400000, guid: da8f6eb394976824fafb9b296781f200, type: 2}
-  _rbMagic: {fileID: 11400000, guid: da8f6eb394976824fafb9b296781f200, type: 2}
-  _ryMagic: {fileID: 11400000, guid: d845cc96ad95f924cbedff773867b91b, type: 2}
-  _byMagic: {fileID: 11400000, guid: d845cc96ad95f924cbedff773867b91b, type: 2}
-  _baseUltimateMagic: {fileID: 0}
+  _baseDebuffMagic: {fileID: 11400000, guid: da8f6eb394976824fafb9b296781f200, type: 2}
+  _baseCrowdControlMagic: {fileID: 11400000, guid: d845cc96ad95f924cbedff773867b91b, type: 2}
+  _baseUltimateMagic: {fileID: 11400000, guid: 2ac53af184aa62645b66f7d09f614018, type: 2}
+  _spellRecipeTable: {fileID: 11400000, guid: cdb8195bae41d784c89ac9ff3aa78277, type: 2}
+  _injectionEffectTable: {fileID: 11400000, guid: 76f2b3b7f7d04d24b53d3b1b29f95c2a, type: 2}
+  _chainEffectTable: {fileID: 11400000, guid: d2238da9f7e7475f87bdf14af81f2fb1, type: 2}
   _mainCamera: {fileID: 862714789}
   _targetGroundLayers:
     serializedVersion: 2
@@ -1405,6 +1403,7 @@ MonoBehaviour:
   _cameraLookInputController: {fileID: 1507257992}
   _playerMovement: {fileID: 0}
   _cameraLookRestoreDelay: 0.08
+  _enableDebugElementInjectKeys: 1
 --- !u!114 &978692064
 MonoBehaviour:
   m_ObjectHideFlags: 0

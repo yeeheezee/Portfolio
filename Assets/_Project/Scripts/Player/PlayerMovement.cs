@@ -12,6 +12,9 @@ namespace WizardBrawl.Player
         [Tooltip("캐릭터의 지상 최대 이동 속도.")]
         [SerializeField] private float moveSpeed = 8f;
 
+        [Tooltip("달리기 입력 시 적용할 이동속도 배율.")]
+        [SerializeField] private float sprintMultiplier = 1.5f;
+
         [Tooltip("캐릭터가 목표 방향을 바라보는 데 걸리는 시간. 낮을수록 빠르게 회전.")]
         [SerializeField] private float rotationSmoothTime = 0.1f;
 
@@ -26,6 +29,7 @@ namespace WizardBrawl.Player
         private Vector2 _moveInput;
         private Vector3 _targetDirection;
         private float _targetRotationVelocity;
+        private bool _isSprintPressed;
 
         private Rigidbody _rb;
         private Transform _mainCameraTransform;
@@ -46,6 +50,11 @@ namespace WizardBrawl.Player
         public void SetMoveInput(Vector2 moveInput)
         {
             _moveInput = moveInput;
+        }
+
+        public void SetSprintPressed(bool isPressed)
+        {
+            _isSprintPressed = isPressed;
         }
 
         private void FixedUpdate()
@@ -83,7 +92,8 @@ namespace WizardBrawl.Player
         /// </summary>
         private void ApplyGroundedMovement()
         {
-            Vector3 targetVelocity = _targetDirection * moveSpeed;
+            float speed = _isSprintPressed ? moveSpeed * sprintMultiplier : moveSpeed;
+            Vector3 targetVelocity = _targetDirection * speed;
             Vector3 velocityChange = (targetVelocity - new Vector3(_rb.linearVelocity.x, 0f, _rb.linearVelocity.z));
 
             velocityChange.x = Mathf.Clamp(velocityChange.x, -maxVelocityChange, maxVelocityChange);
