@@ -104,3 +104,15 @@ InitTestScene*.unity*
 
 # Local portfolio docs (do not commit)
 /Docs/
+
+# External Asset Store packs (keep local only)
+/Assets/Blink/
+/Assets/Blink.meta
+/Assets/Free Low Poly Modular Character Pack - Fantasy Dream/
+/Assets/Free Low Poly Modular Character Pack - Fantasy Dream.meta
+/Assets/Gregor Quendel - Designed Series - Free Cinematic Sound Effects/
+/Assets/Gregor Quendel - Designed Series - Free Cinematic Sound Effects.meta
+/Assets/Kevin Iglesias/
+/Assets/Kevin Iglesias.meta
+/Assets/MoCapCentral/
+/Assets/MoCapCentral.meta

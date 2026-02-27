@@ -75,15 +75,24 @@ namespace WizardBrawl.Player
 
         [Tooltip("마법 데이터에 캐스팅 시간이 없을 때 사용할 후딜 기본값(초).")]
         [SerializeField] private float _castRecoveryTime = 0.18f;
+        
+        [Header("애니메이션")]
+        [Tooltip("Q/E/R 캐스트 Trigger를 전달할 Animator. 비어 있으면 하위에서 자동 탐색함.")]
+        [SerializeField] private Animator _animator;
 
         private bool _isTargeting;
         private MagicData _pendingMagic;
         private bool _pendingUsesUltimateFlow;
+        private string _pendingSlotName;
+        private string _activeCastSlotName;
         private Vector3 _previewTargetPoint;
         private bool _hasPreviewTargetPoint;
         private Vector3 _targetingIndicatorBaseScale = Vector3.one;
         private ChainState _chainState = ChainState.None;
         private readonly CastTimingService _castTimingService = new CastTimingService();
+        private static readonly int CastQHash = Animator.StringToHash("CastQ");
+        private static readonly int CastEHash = Animator.StringToHash("CastE");
+        private static readonly int CastRHash = Animator.StringToHash("CastR");
 
         private enum ChainState
         {
@@ -107,6 +116,11 @@ namespace WizardBrawl.Player
             {
                 _mainCamera = Camera.main;
             }
+            
+            if (_animator == null)
+            {
+                _animator = GetComponentInChildren<Animator>();
+            }
 
             if (_targetingIndicator != null)
             {
@@ -121,10 +135,16 @@ namespace WizardBrawl.Player
         {
             _castTimingService.Cancel("disable");
             SetPlayerMovementEnabled(true);
+            _activeCastSlotName = null;
         }
 
         private void Update()
         {
+            if (_activeCastSlotName != null && !IsCastingLocked)
+            {
+                _activeCastSlotName = null;
+            }
+
             if (!_isTargeting) return;
 
             UpdateTargetingPreview();
@@ -207,7 +227,11 @@ namespace WizardBrawl.Player
             }
 
             Vector3 fallbackPoint = _mainCamera.transform.position + (_mainCamera.transform.forward * _targetingMaxDistance);
-            StartCastSequence(selectedMagic, selectedMagic.UseUltimateFlow, fallbackPoint, $"slot={slotName}");
+            if (StartCastSequence(selectedMagic, selectedMagic.UseUltimateFlow, fallbackPoint, $"slot={slotName}"))
+            {
+                _activeCastSlotName = slotName;
+                TriggerCastAnimation(slotName);
+            }
         }
 
         private static bool RequiresTargeting(MagicData selectedMagic)
@@ -220,6 +244,7 @@ namespace WizardBrawl.Player
             _isTargeting = true;
             _pendingMagic = selectedMagic;
             _pendingUsesUltimateFlow = selectedMagic != null && selectedMagic.UseUltimateFlow;
+            _pendingSlotName = slotName;
             _hasPreviewTargetPoint = false;
             SyncTargetingIndicatorScale(selectedMagic);
             SetTargetingIndicatorVisible(true);
@@ -239,6 +264,8 @@ namespace WizardBrawl.Player
             bool castStarted = StartCastSequence(_pendingMagic, _pendingUsesUltimateFlow, cursorPoint, "target_confirm");
             if (castStarted)
             {
+                _activeCastSlotName = _pendingSlotName;
+                TriggerCastAnimation(_pendingSlotName);
                 bool hasCurrentCursorPoint = TryGetTargetPoint(out Vector3 currentCursorPoint);
                 float targetingDelta = hasCurrentCursorPoint
                     ? Vector3.Distance(currentCursorPoint, cursorPoint)
@@ -265,6 +292,7 @@ namespace WizardBrawl.Player
             _isTargeting = false;
             _pendingMagic = null;
             _pendingUsesUltimateFlow = false;
+            _pendingSlotName = null;
             _hasPreviewTargetPoint = false;
             SetTargetingIndicatorVisible(false);
         }
@@ -495,6 +523,47 @@ namespace WizardBrawl.Player
             }
 
             return fireDirection.normalized;
+        }
+
+        private void TriggerCastAnimation(string slotName)
+        {
+            if (_animator == null || string.IsNullOrEmpty(slotName))
+            {
+                return;
+            }
+
+            _animator.ResetTrigger(CastQHash);
+            _animator.ResetTrigger(CastEHash);
+            _animator.ResetTrigger(CastRHash);
+
+            switch (slotName)
+            {
+                case "Q":
+                    _animator.SetTrigger(CastQHash);
+                    break;
+                case "E":
+                    _animator.SetTrigger(CastEHash);
+                    break;
+                case "R":
+                    _animator.SetTrigger(CastRHash);
+                    break;
+            }
+        }
+
+        public void OnAnimationCastFire()
+        {
+            Debug.Log($"[AnimEvent] CastFire slot={_activeCastSlotName ?? "Unknown"}");
+        }
+
+        public void OnAnimationCastComplete()
+        {
+            Debug.Log($"[AnimEvent] CastComplete slot={_activeCastSlotName ?? "Unknown"}");
+        }
+
+        public void OnAnimationRecoveryEnd()
+        {
+            Debug.Log($"[AnimEvent] RecoveryEnd slot={_activeCastSlotName ?? "Unknown"}");
+            _activeCastSlotName = null;
         }
 
     }
