@@ -23,6 +23,7 @@ namespace WizardBrawl.Player
 
         [Tooltip("속도 변화의 최대치를 제한하여 물리력이 강하게 적용되는 것을 방지.")]
         [SerializeField] private float maxVelocityChange = 20.0f;
+        [SerializeField] private Animator animator;
 
         /// <summary>
         /// 외부에서 움직임을 제어하기 위한 플래그. false 시 즉시 정지.
@@ -37,12 +38,17 @@ namespace WizardBrawl.Player
         private Rigidbody _rb;
         private Transform _mainCameraTransform;
         private PlayerJump _playerJump;
+        private static readonly int MoveXHash = Animator.StringToHash("MoveX");
+        private static readonly int MoveYHash = Animator.StringToHash("MoveY");
+        private static readonly int SpeedHash = Animator.StringToHash("Speed");
+        private const float MoveBlendDampTime = 0.07f;
 
         private void Awake()
         {
             _rb = GetComponent<Rigidbody>();
             _mainCameraTransform = Camera.main.transform;
             _playerJump = GetComponent<PlayerJump>();
+            if (animator == null) animator = GetComponentInChildren<Animator>();
             _rb.freezeRotation = true;
         }
 
@@ -64,6 +70,7 @@ namespace WizardBrawl.Player
         {
             if (!CanMove)
             {
+                UpdateAnimatorParameters(0f, 0f, 0f);
                 StopMovement();
                 return;
             }
@@ -75,6 +82,9 @@ namespace WizardBrawl.Player
             {
                 ApplyGroundedMovement();
             }
+
+            Vector3 horizontalVelocity = new Vector3(_rb.linearVelocity.x, 0f, _rb.linearVelocity.z);
+            UpdateAnimatorParameters(_moveInput.x, _moveInput.y, horizontalVelocity.magnitude);
             // TODO: 공중 이동 제어(Air Control) 로직 추가.
         }
 
@@ -142,6 +152,18 @@ namespace WizardBrawl.Player
         private void StopMovement()
         {
             _rb.linearVelocity = new Vector3(0f, _rb.linearVelocity.y, 0f);
+        }
+
+        private void UpdateAnimatorParameters(float moveX, float moveY, float speed)
+        {
+            if (animator == null)
+            {
+                return;
+            }
+
+            animator.SetFloat(MoveXHash, moveX, MoveBlendDampTime, Time.fixedDeltaTime);
+            animator.SetFloat(MoveYHash, moveY, MoveBlendDampTime, Time.fixedDeltaTime);
+            animator.SetFloat(SpeedHash, speed);
         }
     }
 }

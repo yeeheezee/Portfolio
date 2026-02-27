@@ -19,17 +19,26 @@ namespace WizardBrawl.Player
 
         [Tooltip("패링 성공 시 회복되는 마나량")]
         [SerializeField] private float _manaGainOnSuccess = 30f;
+        
+        [Header("애니메이션")]
+        [Tooltip("패링 시작 시 Trigger를 전달할 Animator. 미지정 시 상위에서 자동 탐색함.")]
+        [SerializeField] private Animator _animator;
 
         private Collider _parryCollider;
         private Mana _playerMana;
         private PlayerElementSlot _playerElementSlot;
         private bool _isParrying;
+        private static readonly int ParryHash = Animator.StringToHash("Parry");
 
         private void Awake()
         {
             _parryCollider = GetComponent<Collider>();
             _playerMana = GetComponentInParent<Mana>();
             _playerElementSlot = GetComponentInParent<PlayerElementSlot>();
+            if (_animator == null)
+            {
+                _animator = GetComponentInParent<Animator>();
+            }
 
             if (_parryCollider == null || _playerMana == null || _playerElementSlot == null)
             {
@@ -46,6 +55,7 @@ namespace WizardBrawl.Player
         public void AttemptParry()
         {
             if (_isParrying || !_playerMana.IsManaAvailable(_manaCost)) return;
+            TriggerParryAnimation();
             StartCoroutine(ParryCoroutine());
         }
 
@@ -73,6 +83,17 @@ namespace WizardBrawl.Player
             yield return new WaitForSeconds(_parryWindow);
             _parryCollider.enabled = false;
             _isParrying = false;
+        }
+
+        private void TriggerParryAnimation()
+        {
+            if (_animator == null)
+            {
+                return;
+            }
+
+            _animator.ResetTrigger(ParryHash);
+            _animator.SetTrigger(ParryHash);
         }
     }
 }

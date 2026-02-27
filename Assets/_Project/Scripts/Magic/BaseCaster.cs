@@ -84,7 +84,11 @@ namespace WizardBrawl.Magic
         public bool IsSkillReady(MagicData skill)
         {
             if (skill == null) return false;
-            _cooldownTimers.TryGetValue(skill, out float lastUsedTime);
+            if (!_cooldownTimers.TryGetValue(skill, out float lastUsedTime))
+            {
+                return true;
+            }
+
             return Time.time >= lastUsedTime + skill.Cooldown;
         }
 
