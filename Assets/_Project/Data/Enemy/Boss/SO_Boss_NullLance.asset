@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed7c3801170e046489cd9bb6ef064b3b, type: 3}
+  m_Name: SO_Boss_NullLance
+  m_EditorClassIdentifier: 
+  _magicName: Null Lance
+  _description: 
+  _icon: {fileID: 0}
+  _manaCost: 20
+  _cooldown: 2
+  _isParryable: 0
+  _parryElement: 0
+  _castMode: 0
+  _useUltimateFlow: 0
+  _castWindupTime: 0.1
+  _castRecoveryTime: 0.15
+  _range: 20
+  _radius: 0.45
+  _damage: 20
+  _targetLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  _isUltimateHit: 0
+  _beamVfxPrefab: {fileID: 0}
+  _beamVfxLifetime: 0.35
