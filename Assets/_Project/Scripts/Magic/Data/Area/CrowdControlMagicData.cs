@@ -26,11 +26,20 @@ namespace WizardBrawl.Magic.Data
         [Tooltip("효과 적용 대상 레이어.")]
         [SerializeField] private LayerMask _targetLayers = ~0;
 
+        [Header("비주얼")]
+        [Tooltip("CC 시각 효과 프리팹(선택).")]
+        [SerializeField] private GameObject _ccVfxPrefab;
+
+        [Tooltip("CC 시각 효과 유지 시간(초).")]
+        [SerializeField] private float _ccVfxLifetime = 1.0f;
+
         public CrowdControlType ControlType => _controlType;
         public float Duration => _duration;
         public float Strength => _strength;
         public float Radius => _radius;
         public LayerMask TargetLayers => _targetLayers;
+        public GameObject CcVfxPrefab => _ccVfxPrefab;
+        public float CcVfxLifetime => _ccVfxLifetime;
 
         /// <summary>
         /// 데이터에 대응하는 CC 실행 효과를 생성함.

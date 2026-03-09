@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01735b740bf74ec4ca9e57ad692e6327, type: 3}
+  m_Name: SO_BossSpellPoolTable
+  m_EditorClassIdentifier: 
+  _entries:
+  - _spell: {fileID: 11400000, guid: b2aab7ec93efa7141a995af99529a7fb, type: 2}
+    _tier: 0
+    _parryRule: 0
+    _phaseGate: 0
+  - _spell: {fileID: 11400000, guid: 3c7da13702c2bf348adb3341b5a9a866, type: 2}
+    _tier: 0
+    _parryRule: 1
+    _phaseGate: 0
+  - _spell: {fileID: 11400000, guid: 09fcbf9f57c23f84bb800f47f48d874b, type: 2}
+    _tier: 1
+    _parryRule: 1
+    _phaseGate: 0
+  - _spell: {fileID: 11400000, guid: e2764f1833b2598419d051745f24e8bf, type: 2}
+    _tier: 1
+    _parryRule: 1
+    _phaseGate: 0
+  - _spell: {fileID: 11400000, guid: 4097c60c5e70f604c8895ef9dba440c9, type: 2}
+    _tier: 1
+    _parryRule: 0
+    _phaseGate: 1

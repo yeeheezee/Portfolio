@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7414193be7a7a7347b1ff5aabc9ac107, type: 3}
+  m_Name: SO_Boss_ArcaneField
+  m_EditorClassIdentifier: 
+  _magicName: Arcane Field
+  _description: 
+  _icon: {fileID: 0}
+  _manaCost: 18
+  _cooldown: 2.2
+  _isParryable: 0
+  _parryElement: 0
+  _castMode: 0
+  _useUltimateFlow: 0
+  _castWindupTime: 0.1
+  _castRecoveryTime: 0.15
+  _radius: 3.8
+  _damagePerTick: 8
+  _duration: 3
+  _tickInterval: 0.5
+  _targetLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  _isUltimateHit: 0
+  _fieldVfxPrefab: {fileID: 0}
+  _fieldVfxLifetime: 1.5

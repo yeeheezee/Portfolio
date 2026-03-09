@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44804c4cbb27b0646aad1ae34cfee35b, type: 3}
+  m_Name: SO_Boss_PrismFan
+  m_EditorClassIdentifier: 
+  _magicName: Prism Fan
+  _description: 
+  _icon: {fileID: 0}
+  _manaCost: 16
+  _cooldown: 2
+  _isParryable: 1
+  _parryElement: 0
+  _castMode: 0
+  _useUltimateFlow: 0
+  _castWindupTime: 0.1
+  _castRecoveryTime: 0.15
+  _projectilePrefab: {fileID: 887699550506029655, guid: 055135e1c426a5b418c9b19a89cf6b64, type: 3}
+  _damage: 10
+  _speed: 13
+  _lifetime: 3
+  _projectileCount: 3
+  _fanAngle: 24
+  _isUltimateHit: 0
