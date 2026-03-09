@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using WizardBrawl.Core;
 using WizardBrawl.Magic.Data;
@@ -24,13 +25,22 @@ namespace WizardBrawl.Magic.Effects
         /// </summary>
         public void Execute(GameObject caster, Transform spawnPoint, Vector3 fireDirection, Vector3 targetPoint)
         {
+            SpawnVfx(targetPoint);
+
             Collider[] hits = Physics.OverlapSphere(targetPoint, _data.Radius, _data.TargetLayers);
             int appliedCount = 0;
+            HashSet<Transform> processedRoots = new HashSet<Transform>();
 
             for (int i = 0; i < hits.Length; i++)
             {
                 GameObject target = hits[i].gameObject;
-                if (target == caster)
+                Transform root = target.transform.root;
+                if (!processedRoots.Add(root))
+                {
+                    continue;
+                }
+
+                if (caster != null && root == caster.transform.root)
                 {
                     continue;
                 }
@@ -43,6 +53,18 @@ namespace WizardBrawl.Magic.Effects
             }
 
             Debug.Log($"[CrowdControlEffect] type={_data.ControlType}, applied={appliedCount}");
+        }
+
+        private void SpawnVfx(Vector3 targetPoint)
+        {
+            if (_data.CcVfxPrefab == null)
+            {
+                return;
+            }
+
+            GameObject vfx = Object.Instantiate(_data.CcVfxPrefab, targetPoint, Quaternion.identity);
+            float lifetime = Mathf.Max(0.05f, _data.CcVfxLifetime);
+            Object.Destroy(vfx, lifetime);
         }
     }
 }
