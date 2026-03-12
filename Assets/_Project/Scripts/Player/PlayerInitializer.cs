@@ -27,6 +27,14 @@ namespace WizardBrawl.Player
         private PlayerAttackCaster _playerAttackCaster;
         private MagicParry _manaParry;
         private bool _isCursorUiMode;
+        private bool _inputBound;
+        private InputAction _moveAction;
+        private InputAction _jumpAction;
+        private InputAction _fireAction;
+        private InputAction _parryAction;
+        private InputAction _castQAction;
+        private InputAction _castEAction;
+        private InputAction _castRAction;
 
         /// <summary>
         /// 컴포넌트들을 캐싱하고 Input System의 액션과 각 컴포넌트의 메서드를 연결(바인딩)함.
@@ -38,15 +46,13 @@ namespace WizardBrawl.Player
             _playerJump = GetComponent<PlayerJump>();
             _playerAttackCaster = GetComponent<PlayerAttackCaster>();
             _manaParry = GetComponentInChildren<MagicParry>();
-
-            _playerInput.actions["Move"].performed += context => _playerMovement.SetMoveInput(context.ReadValue<Vector2>());
-            _playerInput.actions["Move"].canceled += context => _playerMovement.SetMoveInput(Vector2.zero);
-            _playerInput.actions["Jump"].performed += context => _playerJump.PerformJump();
-            _playerInput.actions["Fire"].performed += context => _playerAttackCaster.PerformTargetConfirm();
-            _playerInput.actions["Parry"].performed += OnParryPerformed;
-            RegisterOptionalCastAction("CastQ", OnCastQPerformed);
-            RegisterOptionalCastAction("CastE", OnCastEPerformed);
-            RegisterOptionalCastAction("CastR", OnCastRPerformed);
+            _moveAction = _playerInput.actions["Move"];
+            _jumpAction = _playerInput.actions["Jump"];
+            _fireAction = _playerInput.actions["Fire"];
+            _parryAction = _playerInput.actions["Parry"];
+            _castQAction = FindOptionalAction("CastQ");
+            _castEAction = FindOptionalAction("CastE");
+            _castRAction = FindOptionalAction("CastR");
 
             ApplyCombatCursorMode();
         }
@@ -62,15 +68,130 @@ namespace WizardBrawl.Player
 
         private void OnEnable()
         {
+            BindInputActions();
             // 재활성화 시 ALT 입력 상태를 기준으로 커서 모드를 복구함.
             SyncCursorModeFromCurrentInput();
         }
 
         private void OnDisable()
         {
+            UnbindInputActions();
+            _playerMovement?.SetMoveInput(Vector2.zero);
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
             _isCursorUiMode = true;
+        }
+
+        private void BindInputActions()
+        {
+            if (_inputBound)
+            {
+                return;
+            }
+
+            if (_moveAction != null)
+            {
+                _moveAction.performed += OnMovePerformed;
+                _moveAction.canceled += OnMoveCanceled;
+            }
+
+            if (_jumpAction != null)
+            {
+                _jumpAction.performed += OnJumpPerformed;
+            }
+
+            if (_fireAction != null)
+            {
+                _fireAction.performed += OnFirePerformed;
+            }
+
+            if (_parryAction != null)
+            {
+                _parryAction.performed += OnParryPerformed;
+            }
+
+            if (_castQAction != null)
+            {
+                _castQAction.performed += OnCastQPerformed;
+            }
+
+            if (_castEAction != null)
+            {
+                _castEAction.performed += OnCastEPerformed;
+            }
+
+            if (_castRAction != null)
+            {
+                _castRAction.performed += OnCastRPerformed;
+            }
+
+            _inputBound = true;
+        }
+
+        private void UnbindInputActions()
+        {
+            if (!_inputBound)
+            {
+                return;
+            }
+
+            if (_moveAction != null)
+            {
+                _moveAction.performed -= OnMovePerformed;
+                _moveAction.canceled -= OnMoveCanceled;
+            }
+
+            if (_jumpAction != null)
+            {
+                _jumpAction.performed -= OnJumpPerformed;
+            }
+
+            if (_fireAction != null)
+            {
+                _fireAction.performed -= OnFirePerformed;
+            }
+
+            if (_parryAction != null)
+            {
+                _parryAction.performed -= OnParryPerformed;
+            }
+
+            if (_castQAction != null)
+            {
+                _castQAction.performed -= OnCastQPerformed;
+            }
+
+            if (_castEAction != null)
+            {
+                _castEAction.performed -= OnCastEPerformed;
+            }
+
+            if (_castRAction != null)
+            {
+                _castRAction.performed -= OnCastRPerformed;
+            }
+
+            _inputBound = false;
+        }
+
+        private void OnMovePerformed(InputAction.CallbackContext context)
+        {
+            _playerMovement?.SetMoveInput(context.ReadValue<Vector2>());
+        }
+
+        private void OnMoveCanceled(InputAction.CallbackContext context)
+        {
+            _playerMovement?.SetMoveInput(Vector2.zero);
+        }
+
+        private void OnJumpPerformed(InputAction.CallbackContext context)
+        {
+            _playerJump?.PerformJump();
+        }
+
+        private void OnFirePerformed(InputAction.CallbackContext context)
+        {
+            _playerAttackCaster?.PerformTargetConfirm();
         }
 
         private void OnParryPerformed(InputAction.CallbackContext context)
@@ -169,16 +290,16 @@ namespace WizardBrawl.Player
             }
         }
 
-        private void RegisterOptionalCastAction(string actionName, System.Action<InputAction.CallbackContext> callback)
+        private InputAction FindOptionalAction(string actionName)
         {
             InputAction action = _playerInput.actions[actionName];
             if (action == null)
             {
                 Debug.LogWarning($"[Input] missing action: {actionName}");
-                return;
+                return null;
             }
 
-            action.performed += callback;
+            return action;
         }
 
         private bool IsTargetingBlockedAction(string actionName)
