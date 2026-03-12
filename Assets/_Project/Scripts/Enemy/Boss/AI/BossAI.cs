@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
@@ -44,9 +45,8 @@ namespace WizardBrawl.Enemy
         [SerializeField] private int _maxCastsPerAttackWindow = 1;
 
         private enum State { Idle, MaintainingDistance, Attacking }
-        private enum CombatPhase { Phase1, Phase2 }
         private State _currentState;
-        private CombatPhase _currentPhase = CombatPhase.Phase1;
+        private BossCombatPhase _currentPhase = BossCombatPhase.Phase1;
 
         private Transform _playerTransform;
         private BossAttackCaster _attackCaster;
@@ -66,6 +66,12 @@ namespace WizardBrawl.Enemy
         private int _castsInCurrentAttackWindow;
         private string _pendingSpellName = "none";
 
+        public BossCombatPhase CurrentPhase => _currentPhase;
+        public bool IsPhase2Active => _currentPhase == BossCombatPhase.Phase2;
+        public float Phase2ThresholdHealthNormalized => 0.5f;
+        public event Action<BossCombatPhase> OnPhaseChanged;
+        public event Action<float, float> OnBossHealthChanged;
+
         /// <summary>
         /// 디버프 적용으로 증가한 피격 계수(추후 데미지 파이프라인 연동용).
         /// </summary>
@@ -82,6 +88,22 @@ namespace WizardBrawl.Enemy
         {
             InitializeTarget();
             _attackProgressHeartbeatTime = Time.time;
+        }
+
+        private void OnEnable()
+        {
+            if (_health != null)
+            {
+                _health.OnHealthChanged += HandleBossHealthChanged;
+            }
+        }
+
+        private void OnDisable()
+        {
+            if (_health != null)
+            {
+                _health.OnHealthChanged -= HandleBossHealthChanged;
+            }
         }
 
         private void Update()
@@ -418,7 +440,7 @@ namespace WizardBrawl.Enemy
                 return false;
             }
 
-            int randomIndex = Random.Range(0, _selectionBuffer.Count);
+            int randomIndex = UnityEngine.Random.Range(0, _selectionBuffer.Count);
             selectedEntry = _selectionBuffer[randomIndex];
             Debug.Log($"[BossAI] select spell={selectedEntry.Spell.MagicName} tier={selectedEntry.Tier} parry={selectedEntry.ParryRule} phaseGate={selectedEntry.PhaseGate}");
             return true;
@@ -431,7 +453,7 @@ namespace WizardBrawl.Enemy
                 return;
             }
 
-            if (_currentPhase == CombatPhase.Phase2)
+            if (_currentPhase == BossCombatPhase.Phase2)
             {
                 return;
             }
@@ -442,8 +464,9 @@ namespace WizardBrawl.Enemy
                 return;
             }
 
-            _currentPhase = CombatPhase.Phase2;
+            _currentPhase = BossCombatPhase.Phase2;
             _candidateCacheDirty = true;
+            OnPhaseChanged?.Invoke(_currentPhase);
             Debug.Log($"[BossState] phase transition: Phase1 -> Phase2 (hp={_health.CurrentHealth:0.0}/{_health.MaxHealth:0.0})");
             MarkAttackProgress();
         }
@@ -490,9 +513,9 @@ namespace WizardBrawl.Enemy
                 case BossPhaseGate.AllPhases:
                     return true;
                 case BossPhaseGate.Phase1Only:
-                    return _currentPhase == CombatPhase.Phase1;
+                    return _currentPhase == BossCombatPhase.Phase1;
                 case BossPhaseGate.Phase2Only:
-                    return _currentPhase == CombatPhase.Phase2;
+                    return _currentPhase == BossCombatPhase.Phase2;
                 default:
                     return false;
             }
@@ -583,6 +606,11 @@ namespace WizardBrawl.Enemy
         private void SetExpectedWait(float waitSeconds)
         {
             _attackWaitUntilTime = Time.time + Mathf.Max(0f, waitSeconds);
+        }
+
+        private void HandleBossHealthChanged(float currentHealth, float maxHealth)
+        {
+            OnBossHealthChanged?.Invoke(currentHealth, maxHealth);
         }
     }
 }
