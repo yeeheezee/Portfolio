@@ -27,7 +27,7 @@ MonoBehaviour:
   _duration: 4
   _magnitude: 0.25
   _projectilePrefab: {fileID: 887699550506029655, guid: 055135e1c426a5b418c9b19a89cf6b64, type: 3}
-  _projectileSpeed: 18
+  _projectileSpeed: 10
   _projectileLifetime: 2.2
   _targetLayers:
     serializedVersion: 2

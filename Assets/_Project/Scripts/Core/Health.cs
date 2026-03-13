@@ -60,6 +60,7 @@ namespace WizardBrawl.Core
         public void TakeDamage(float damageAmount)
         {
             if (IsDead || damageAmount < 0) return;
+            Debug.Log($"[Health] take_damage target={gameObject.name} current={CurrentHealth:0.00} damage={damageAmount:0.00}");
             SetHealth(CurrentHealth - damageAmount);
         }
 
@@ -83,6 +84,7 @@ namespace WizardBrawl.Core
             if (CurrentHealth != newHealth)
             {
                 CurrentHealth = newHealth;
+                Debug.Log($"[Health] changed target={gameObject.name} current={CurrentHealth:0.00} max={MaxHealth:0.00}");
                 OnHealthChanged?.Invoke(CurrentHealth, MaxHealth);
             }
 

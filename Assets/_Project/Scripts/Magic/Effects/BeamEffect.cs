@@ -51,14 +51,14 @@ namespace WizardBrawl.Magic.Effects
                     continue;
                 }
 
-                if (hit.TryGetComponent<IStatusReceiver>(out IStatusReceiver receiver))
+                if (root.TryGetComponent<IStatusReceiver>(out IStatusReceiver receiver))
                 {
                     receiver.ApplyStatus(StatusEvent.CreateDamage(_data.Damage, _data.IsUltimateHit, caster));
                     appliedCount++;
                     continue;
                 }
 
-                if (hit.TryGetComponent<Health>(out Health health))
+                if (root.TryGetComponent<Health>(out Health health))
                 {
                     health.TakeDamage(_data.Damage);
                     appliedCount++;

@@ -4,7 +4,8 @@
     "references": [
         "WizardBrawl.Core",
         "WizardBrawl.Magic",
-        "WizardBrawl.Enemy"
+        "WizardBrawl.Enemy",
+        "WizardBrawl.Player"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

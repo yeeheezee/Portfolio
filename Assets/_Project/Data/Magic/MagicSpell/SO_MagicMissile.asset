@@ -25,6 +25,6 @@ MonoBehaviour:
   _castRecoveryTime: 0.45
   _projectilePrefab: {fileID: 887699550506029655, guid: 055135e1c426a5b418c9b19a89cf6b64, type: 3}
   _damage: 45
-  _speed: 22
+  _speed: 12
   _lifetime: 4
   _isUltimateHit: 1
