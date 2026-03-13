@@ -330,10 +330,10 @@ namespace WizardBrawl.Player
             Vector3 fireDirection = BuildFireDirection(targetPoint);
             if (usesUltimateFlow)
             {
-                return TryCastUltimate(selectedMagic, fireDirection);
+                return TryCastUltimate(selectedMagic, fireDirection, targetPoint);
             }
 
-            bool castSuccess = TryUseSkill(selectedMagic, fireDirection);
+            bool castSuccess = TryUseSkill(selectedMagic, fireDirection, targetPoint);
             if (castSuccess)
             {
                 UpdatePatternStateOnCast(selectedMagic);
@@ -342,12 +342,12 @@ namespace WizardBrawl.Player
             return castSuccess;
         }
 
-        private bool TryCastUltimate(MagicData enhancedUltimate, Vector3 fireDirection)
+        private bool TryCastUltimate(MagicData enhancedUltimate, Vector3 fireDirection, Vector3 targetPoint)
         {
             bool hasEnhancedState = _chainState == ChainState.CrowdControlReady;
             if (hasEnhancedState && enhancedUltimate != null && CanUseSkillNow(enhancedUltimate))
             {
-                if (TryUseSkill(enhancedUltimate, fireDirection))
+                if (TryUseSkill(enhancedUltimate, fireDirection, targetPoint))
                 {
                     Debug.Log("[ElementCombo] pattern=CC->Ultimate stage=Success");
                     Debug.Log("[CastResult] CC->Ultimate enhanced cast");
@@ -372,7 +372,7 @@ namespace WizardBrawl.Player
                 return false;
             }
             
-            bool fallbackSuccess = TryUseSkill(fallbackUltimate, fireDirection);
+            bool fallbackSuccess = TryUseSkill(fallbackUltimate, fireDirection, targetPoint);
             if (fallbackSuccess)
             {
                 Debug.Log("[ElementCombo] pattern=CC->Ultimate stage=Fallback");

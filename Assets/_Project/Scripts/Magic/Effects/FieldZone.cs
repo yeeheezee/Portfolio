@@ -72,14 +72,14 @@ namespace WizardBrawl.Magic.Effects
                 }
 
                 GameObject target = hit.gameObject;
-                if (target.TryGetComponent<IStatusReceiver>(out IStatusReceiver receiver))
+                if (root.TryGetComponent<IStatusReceiver>(out IStatusReceiver receiver))
                 {
                     receiver.ApplyStatus(StatusEvent.CreateDamage(_data.DamagePerTick, _data.IsUltimateHit, _caster));
                     appliedCount++;
                     continue;
                 }
 
-                if (target.TryGetComponent<Health>(out Health health))
+                if (root.TryGetComponent<Health>(out Health health))
                 {
                     health.TakeDamage(_data.DamagePerTick);
                     appliedCount++;

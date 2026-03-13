@@ -1,5 +1,6 @@
 using WizardBrawl.Core;
 using UnityEngine;
+using System;
 
 namespace WizardBrawl.Enemy
 {
@@ -10,6 +11,8 @@ namespace WizardBrawl.Enemy
     public class Boss : MonoBehaviour
     {
         private Health _health;
+
+        public event Action OnBossDied;
 
         private void Awake()
         {
@@ -31,6 +34,7 @@ namespace WizardBrawl.Enemy
         /// </summary>
         private void HandleDeath()
         {
+            OnBossDied?.Invoke();
             Debug.Log("보스가 처치됨. 오브젝트를 파괴합니다.");
             // TODO: GameManager에 게임 승리를 알리는 로직으로 대체.
             Destroy(gameObject);

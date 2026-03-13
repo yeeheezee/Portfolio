@@ -29,5 +29,23 @@ namespace WizardBrawl.Enemy
         public float UnparryableAttackCooldown = 2.0f;
         [Tooltip("하나의 공격 사이클이 끝난 뒤, 다음 공격을 시작하기 전까지의 최소 휴식 시간")]
         public float RestBetweenAttacks = 0.8f;
+
+        [Header("공격 선택")]
+        [Tooltip("이 거리 이하이면 근접 압박 구간으로 간주함.")]
+        public float CloseRangeThreshold = 10f;
+        [Tooltip("이 거리 이상이면 원거리 구간으로 간주함.")]
+        public float FarRangeThreshold = 18f;
+        [Tooltip("원거리 구간에서 투사체 계열 선호 가중치.")]
+        public float ProjectileFarWeightBonus = 2.5f;
+        [Tooltip("중거리 구간에서 CC 계열 선호 가중치.")]
+        public float CrowdControlMidWeightBonus = 2.2f;
+        [Tooltip("중거리 구간에서 장판 계열 선호 가중치.")]
+        public float FieldMidWeightBonus = 1.8f;
+        [Tooltip("가까운 거리에서 장판 계열 선호 가중치.")]
+        public float FieldCloseWeightBonus = 2.3f;
+        [Tooltip("너무 가까울 때 투사체 계열 감쇠치.")]
+        public float ProjectileCloseWeightPenalty = 0.45f;
+        [Tooltip("CC 이후 궁 연계 선호 가중치.")]
+        public float UltimateChainWeightBonus = 2.5f;
     }
 }

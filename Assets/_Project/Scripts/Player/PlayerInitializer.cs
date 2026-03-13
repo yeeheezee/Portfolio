@@ -32,6 +32,7 @@ namespace WizardBrawl.Player
         private InputAction _jumpAction;
         private InputAction _fireAction;
         private InputAction _parryAction;
+        private InputAction _sprintAction;
         private InputAction _castQAction;
         private InputAction _castEAction;
         private InputAction _castRAction;
@@ -50,6 +51,7 @@ namespace WizardBrawl.Player
             _jumpAction = _playerInput.actions["Jump"];
             _fireAction = _playerInput.actions["Fire"];
             _parryAction = _playerInput.actions["Parry"];
+            _sprintAction = FindOptionalAction("Sprint");
             _castQAction = FindOptionalAction("CastQ");
             _castEAction = FindOptionalAction("CastE");
             _castRAction = FindOptionalAction("CastR");
@@ -110,6 +112,13 @@ namespace WizardBrawl.Player
                 _parryAction.performed += OnParryPerformed;
             }
 
+            if (_sprintAction != null)
+            {
+                _sprintAction.started += OnSprintChanged;
+                _sprintAction.performed += OnSprintChanged;
+                _sprintAction.canceled += OnSprintChanged;
+            }
+
             if (_castQAction != null)
             {
                 _castQAction.performed += OnCastQPerformed;
@@ -156,6 +165,13 @@ namespace WizardBrawl.Player
                 _parryAction.performed -= OnParryPerformed;
             }
 
+            if (_sprintAction != null)
+            {
+                _sprintAction.started -= OnSprintChanged;
+                _sprintAction.performed -= OnSprintChanged;
+                _sprintAction.canceled -= OnSprintChanged;
+            }
+
             if (_castQAction != null)
             {
                 _castQAction.performed -= OnCastQPerformed;
@@ -171,6 +187,7 @@ namespace WizardBrawl.Player
                 _castRAction.performed -= OnCastRPerformed;
             }
 
+            _playerMovement?.SetSprintPressed(false);
             _inputBound = false;
         }
 
@@ -209,6 +226,11 @@ namespace WizardBrawl.Player
             }
 
             _manaParry?.AttemptParry();
+        }
+
+        private void OnSprintChanged(InputAction.CallbackContext context)
+        {
+            _playerMovement?.SetSprintPressed(context.phase != InputActionPhase.Canceled && context.ReadValueAsButton());
         }
 
         private void OnCastQPerformed(InputAction.CallbackContext context)

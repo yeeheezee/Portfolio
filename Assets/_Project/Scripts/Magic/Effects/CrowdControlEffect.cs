@@ -33,7 +33,13 @@ namespace WizardBrawl.Magic.Effects
 
             for (int i = 0; i < hits.Length; i++)
             {
-                GameObject target = hits[i].gameObject;
+                Collider hit = hits[i];
+                if (hit == null)
+                {
+                    continue;
+                }
+
+                GameObject target = hit.gameObject;
                 Transform root = target.transform.root;
                 if (!processedRoots.Add(root))
                 {
@@ -45,9 +51,12 @@ namespace WizardBrawl.Magic.Effects
                     continue;
                 }
 
-                if (target.TryGetComponent<IStatusReceiver>(out IStatusReceiver receiver))
+                if (root.TryGetComponent<IStatusReceiver>(out IStatusReceiver receiver))
                 {
                     receiver.ApplyStatus(StatusEvent.CreateCrowdControl(_data.ControlType, _data.Duration, _data.Strength, caster));
+                    Debug.Log(
+                        $"[CrowdControlEffect] target={target.name} root={root.name} " +
+                        $"type={_data.ControlType} duration={_data.Duration:0.00} strength={_data.Strength:0.00}");
                     appliedCount++;
                 }
             }
